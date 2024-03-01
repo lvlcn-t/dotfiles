@@ -1,0 +1,157 @@
+# (c) 2024 lvlcn-t - zshrc
+#   - zsh: https://www.zsh.org/
+#
+# Preqs: Each prerequisite is listed in the comments above the line that requires it
+
+export LANG=C.UTF-8
+
+sourceIfExists () {
+	test -f $1 && source $1
+}
+sourceIfExists $HOME/.env
+
+HISTFILE=~/.zsh_history
+HISTSIZE=10000
+SAVEHIST=10000
+setopt appendhistory
+
+# Brew is a package manager for macOS and Linux: https://brew.sh/
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+
+# Load the default .profile
+[[ -e ~/.profile ]] && emulate sh -c 'source ~/.profile'
+
+# Zplug is a plugin manager for zsh: https://github.com/zplug/zplug
+sourceIfExists "$HOME/.zplug/init.zsh"
+
+unsetopt beep extendedglob nomatch
+bindkey -e
+
+bindkey "^[[1;5C" forward-word
+bindkey "^[[1;5D" backward-word
+bindkey "^H" backward-kill-word
+bindkey "5~" kill-word
+bindkey "^[[3~" delete-char
+
+
+# If you come from bash you might have to change your $PATH.
+# export PATH=$HOME/bin:/usr/local/bin:$PATH
+
+# Powerlevel10k Configuration - https://github.com/romkatv/powerlevel10k
+sourceIfExists "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+sourceIfExists "$HOME/.p10k.zsh" # Customized prompt - run `p10k configure`, or edit ~/.p10k.zsh to change it
+
+# zplug Configuration
+zplug "plugins/git",   from:oh-my-zsh
+zplug "plugins/kubectl",   from:oh-my-zsh
+zplug "plugins/helm",   from:oh-my-zsh
+zplug "plugins/command-not-found",   from:oh-my-zsh
+zplug "plugins/docker",   from:oh-my-zsh
+zplug "plugins/docker-compose",   from:oh-my-zsh
+zplug "plugins/dotenv",   from:oh-my-zsh
+zplug "plugins/jsontools",   from:oh-my-zsh
+zplug "plugins/asdf",   from:oh-my-zsh
+zplug "zsh-users/zsh-syntax-highlighting", defer:2
+zplug "zsh-users/zsh-completions", defer:2
+zplug reegnz/jq-zsh-plugin
+
+zplug romkatv/powerlevel10k, as:theme, depth:1
+
+sourceIfExists "$HOME/.cargo/env"
+
+if ! zplug check --verbose; then
+    printf "Install? [y/N]: "
+    if read -q; then
+        echo; zplug install
+    fi
+fi
+
+zplug load
+
+# eza is a command line tool for file management: https://github.com/eza-community/eza
+if  command -v eza &> /dev/null
+then
+		alias ls='eza'
+		alias ll='eza -lah --icons'
+		alias tree='eza -lah --icons --tree'
+fi
+
+# docker is a containerization platform: https://www.docker.com/
+if  command -v docker &> /dev/null
+then
+        # dive is a tool for exploring a docker image: https://github.com/wagoodman/dive
+		alias dive="docker run -ti --rm  -v /var/run/docker.sock:/var/run/docker.sock wagoodman/dive"
+fi
+
+# nvim is a text editor: https://neovim.io/
+export PATH="$PATH:/opt/nvim-linux64/bin"
+if  command -v nvim &> /dev/null
+then
+		alias vim='nvim'
+fi
+
+# code-insiders is the insiders version of Visual Studio Code: https://code.visualstudio.com/insiders/
+if  command -v code-insiders &> /dev/null
+then
+    alias code='code-insiders'
+fi
+
+# go is a programming language: https://golang.org/
+export PATH=$PATH:/usr/local/go/bin
+if command -v go &> /dev/null
+then
+    export PATH=$PATH:$HOME/go/bin # Add go bin directory to PATH, this is where go install puts binaries
+    export GOPRIVATE=gitlab.devops.telekom.de # Set the GOPRIVATE environment variable to enable private go modules
+    export GO111MODULE=on # Enable go modules
+fi
+
+# kubectl is a command line tool for kubernetes: https://kubernetes.io/docs/reference/kubectl/overview/
+if  command -v kubectl &> /dev/null
+then
+    source <(kubectl completion zsh)
+    alias k=kubectl
+fi
+
+# kind is a tool for running local kubernetes clusters: https://kind.sigs.k8s.io/
+if command -v kind &> /dev/null
+then
+    source <(kind completion zsh)
+fi
+
+# helm is a package manager for kubernetes: https://helm.sh/
+if command -v helm &> /dev/null
+then
+    source <(helm completion zsh)
+fi
+
+# gh is the GitHub CLI: https://cli.github.com/
+if command -v gh &> /dev/null
+then
+    source <(gh completion -s zsh)
+fi
+
+# glab is a GitLab CLI: https://gitlab.com/gitlab-org/cli
+if command -v glab &> /dev/null
+then
+    autoload -U compinit; compinit
+    source <(glab completion -s zsh); compdef _glab glab
+fi
+
+# chezmoi is a dotfile manager: https://www.chezmoi.io/
+if command -v chezmoi &> /dev/null
+then
+    source <(chezmoi completion zsh)
+fi
+
+# nvm is a version manager for node.js: https://github.com/nvm-sh/nvm
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+
+# pnpm is a package manager for node.js: https://pnpm.io/
+export PNPM_HOME="$HOME/.local/share/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end
