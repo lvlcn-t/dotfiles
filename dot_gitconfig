@@ -1,0 +1,25 @@
+[init]
+    defaultBranch = main
+
+[includeIf "hasconfig:remote.*.url:git@github.com*/**"]
+    path = .gitconfig-personal
+
+[includeIf "hasconfig:remote.*.url:git@gitlab.devops.telekom.de*/**"]
+    path = .gitconfig-work
+
+[includeIf "hasconfig:remote.*.url:https://github.com/**"]
+    path = .gitconfig-personal
+
+[includeIf "hasconfig:remote.*.url:https://gitlab.devops.telekom.de/**"]
+    path = .gitconfig-work
+
+[user]
+	name = lvlcn-t
+	email = 75443136+lvlcn-t@users.noreply.github.com
+	signingkey = ~/.ssh/id_rsa.pub
+
+[gpg]
+	format = ssh
+
+[commit]
+	gpgsign = true
