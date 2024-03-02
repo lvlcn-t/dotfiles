@@ -1,0 +1,158 @@
+#!/bin/sh
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+{{ if eq .chezmoi.os "linux" -}}
+
+# install_eza installs the eza command line tool for file management
+install_eza(){
+  sudo mkdir -p /etc/apt/keyrings
+  wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | sudo gpg --dearmor -o /etc/apt/keyrings/gierens.gpg
+  echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main" | sudo tee /etc/apt/sources.list.d/gierens.list
+  sudo chmod 644 /etc/apt/keyrings/gierens.gpg /etc/apt/sources.list.d/gierens.list
+  sudo apt update
+  sudo apt install -y eza
+}
+
+# install_docker installs the docker engine
+install_docker(){
+  sudo apt update
+  sudo apt install ca-certificates curl
+  sudo install -m 0755 -d /etc/apt/keyrings
+  sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+  sudo chmod a+r /etc/apt/keyrings/docker.asc
+  echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+  sudo apt update
+  sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+}
+
+# install neovim installs the neovim text editor
+install_neovim(){
+  sudo add-apt-repository ppa:neovim-ppa/stable
+  sudo apt-get update
+  sudo apt-get install neovim
+}
+
+# install_go installs the latest version of the go programming language
+install_go(){
+  go_version=$(curl -fsSL "https://go.dev/dl/?mode=json" | jq -r '.[0].version')
+  curl -LO https://golang.org/dl/$go_version.linux-amd64.tar.gz
+  sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf $go_version.linux-amd64.tar.gz
+  rm $go_version.linux-amd64.tar.gz
+}
+
+# validate_kubectl installs the kubectl binary and validates it
+# Returns 0 if the kubectl binary is valid, 1 otherwise
+validate_kubectl() {
+  for attempt in 1 2 3; do
+    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"
+    echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
+    if [ $? -eq 0 ]; then
+      return 0
+    fi
+    if [ $attempt -eq 3 ]; then
+      echo "Error: Failed to validate kubectl binary."
+      return 1
+    fi
+    echo "Retrying..."
+  done
+}
+
+# install_kubectl installs the kubectl binary
+install_kubectl(){
+  validate_kubectl
+  if [ $? -ne 0 ]; then
+    echo "Error: Failed to validate kubectl binary."
+    return 1
+  fi
+  sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+  rm kubectl
+}
+
+# install_helm installs the helm binary
+install_helm(){
+  curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+}
+
+# install_gh_cli installs the gh command line tool
+install_gh_cli(){
+  sudo mkdir -p -m 755 /etc/apt/keyrings && wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null \
+  && sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
+  && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+  && sudo apt update \
+  && sudo apt install gh -y
+}
+
+# install_nvm installs the node version manager
+install_nvm(){
+  PROFILE=/dev/null bash -c 'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash'
+}
+
+
+sudo apt update
+if ! command -v git &> /dev/null; then
+  sudo add-apt-repository ppa:git-core/ppa -y
+else
+  installed_git_version=$(git --version | awk '{print $3}')
+  required_git_version="2.36.0"
+  
+  if [[ $installed_git_version < $required_git_version ]]; then
+    sudo add-apt-repository ppa:git-core/ppa -y
+  fi
+fi
+sudo apt install -y build-essential software-properties-common curl gpg git neovim tree wget zsh
+
+if ! command -v zplug &> /dev/null
+then
+  curl -sL --proto-redir -all,https https://raw.githubusercontent.com/zplug/installer/master/installer.zsh | zsh
+fi
+
+if ! command -v eza &> /dev/null
+then
+  install_eza
+fi
+
+if ! command -v docker &> /dev/null
+then
+  install_docker
+fi
+
+if ! command -v nvim &> /dev/null
+then
+  install_neovim
+fi
+
+if ! command -v go &> /dev/null
+then
+  install_go
+fi
+
+if ! command -v kubectl &> /dev/null
+then
+  install_kubectl
+  if [ $? -ne 0 ]; then
+    echo "Error: Failed to install kubectl binary."
+  fi
+fi
+
+if ! command -v helm &> /dev/null
+then
+  install_helm
+fi
+
+if ! command -v gh &> /dev/null
+then
+  install_gh_cli
+fi
+
+if ! command -v nvm &> /dev/null
+then
+  install_nvm
+fi
+
+{{- end }}
+
+brew bundle install --file={{ .chezmoi.sourceDir }}/Brewfile
