@@ -15,3 +15,15 @@ This dotfiles collection includes configurations for Zsh, Git, wget and npm, alo
 - 📦 **dot_npmrc**: npm configuration file for managing node package settings.
 
 Feel free to explore and adapt these configurations to suit your own development needs and preferences. Happy coding! 😄
+
+## Installation 🚀
+
+This installation process will **overwrite** any existing configuration files, so make sure to back up your current dotfiles before proceeding.
+
+To install my dotfiles, simply run the following command in your terminal:
+
+```bash
+sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply lvlcn-t
+```
+
+This command will install [chezmoi](https://chezmoi.io/) and apply my dotfiles to your system. Chezmoi is a tool for managing dotfiles across multiple machines, and it provides a simple and secure way to manage your configuration files. You can find more information about chezmoi and its usage in the [official documentation](https://www.chezmoi.io/docs/).
