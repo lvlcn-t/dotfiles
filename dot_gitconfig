@@ -14,9 +14,7 @@
     path = .gitconfig-work
 
 [user]
-	name = lvlcn-t
-	email = 75443136+lvlcn-t@users.noreply.github.com
-	signingkey = ~/.ssh/id_rsa.pub
+    signingkey = ~/.ssh/id_rsa.pub
 
 [gpg]
 	format = ssh
