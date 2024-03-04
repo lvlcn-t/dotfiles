@@ -6,4 +6,4 @@ proxy:
   enabled: false
   http: http://proxy.example.com:8080
   https: https://proxy.example.com:8080
-  no_proxy: example.com
+  noProxy: example.com
