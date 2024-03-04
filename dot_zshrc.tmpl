@@ -159,3 +159,12 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 # pnpm end
+
+{{- if .proxy.enabled }}
+export HTTP_PROXY={{ .proxy.http }}
+export HTTPS_PROXY={{ .proxy.https }}
+export NO_PROXY={{ .proxy.noProxy }}
+export http_proxy={{ .proxy.http }}
+export https_proxy={{ .proxy.https }}
+export no_proxy={{ .proxy.noProxy }}
+{{- end }}
