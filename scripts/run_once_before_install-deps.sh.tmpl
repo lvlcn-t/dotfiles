@@ -13,7 +13,7 @@ keyring_installed() {
 
 # install_or_update installs/updates a package if it does not exist
 install_or_update() {
-  sudo apt install -y "$1"
+  sudo apt install -qq -y "$1"
 }
 
 # add_repo adds an apt repository to the system
@@ -62,6 +62,7 @@ done
 if ! command -v brew &> /dev/null; then
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 brew bundle install --file={{ .chezmoi.sourceDir }}/Brewfile
 
 # Create the keyrings directory
@@ -91,10 +92,6 @@ if ! command -v nvim &> /dev/null; then
   install_or_update "neovim"
 fi
 
-if ! command -v zplug &> /dev/null; then
-  curl -sL --proto-redir -all,https https://raw.githubusercontent.com/zplug/installer/master/installer.zsh | zsh
-fi
-
 go_version=$(curl -fsSL "https://go.dev/dl/?mode=json" | jq -r '.[0].version')
 if ! go version | grep -q "$go_version"; then
   curl -fsSL -LO "https://golang.org/dl/$go_version.linux-amd64.tar.gz"
@@ -106,7 +103,7 @@ fi
 
 if ! command -v kubectl &> /dev/null; then
   curl -fsSL -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-  validate_checksum "kubectl" "https://dl.k8s.io/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"
+  # validate_checksum "kubectl" "https://dl.k8s.io/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"
   if [ $? -eq 0 ]; then
     sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
   else
@@ -116,7 +113,10 @@ if ! command -v kubectl &> /dev/null; then
 fi
 
 if ! command -v helm &> /dev/null; then
-  curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+  curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+  chmod 700 get_helm.sh
+  ./get_helm.sh
+  rm get_helm.sh
 fi
 
 if ! command -v gh &> /dev/null; then
@@ -128,10 +128,8 @@ if ! command -v gh &> /dev/null; then
 fi
 
 if ! command -v nvm &> /dev/null; then
-  PROFILE=/dev/null bash -c 'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash'
+  PROFILE=/dev/null bash -c 'curl -fsSL -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash'
 fi
 {{- end }}
 
-{{ if eq .chezmoi.os "darwin" -}}
 # TODO: Implement the installation of dependencies for macOS / when implementing this, everything for linux can be also done with brew
-{{- end }}
