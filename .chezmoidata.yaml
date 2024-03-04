@@ -1,0 +1,9 @@
+netrc:
+  url: https://gitlab.com
+  token: glpat-xxxxxxx
+
+proxy:
+  enabled: false
+  http: http://proxy.example.com:8080
+  https: https://proxy.example.com:8080
+  no_proxy: example.com

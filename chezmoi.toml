@@ -1,0 +1,8 @@
+[git]
+autoCommit = true
+autoPush = false
+commitMessageTemplate = "{{ promptString \"Commit message\" }}"
+
+[edit]
+command = "code"
+args = "--wait"
