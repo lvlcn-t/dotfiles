@@ -1,3 +1,7 @@
+chezmoi.toml
+.chezmoidata.yaml
+.gitignore
+.pre-commit-config.yaml
 README.md
 LICENSE
 Dockerfile
