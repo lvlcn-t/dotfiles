@@ -1,0 +1,9 @@
+README.md
+LICENSE
+Dockerfile
+Makefile
+
+scripts/
+scripts/**
+.vscode/
+.vscode/**
