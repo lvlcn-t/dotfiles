@@ -1,5 +1,8 @@
-#!/bin/sh
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+#!/bin/bash
+
+# (c) 2024 lvlcn-t - pre-install-deps
+# This script is consumed by chezmoi to install dependencies once before running the dotfiles
+# It is idempotent and can be run multiple times without causing issues
 
 {{ if eq .chezmoi.os "linux" -}}
 
@@ -51,10 +54,12 @@ validate_kubectl() {
     curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"
     echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
     if [ $? -eq 0 ]; then
+      rm -f kubectl.sha256
       return 0
     fi
     if [ $attempt -eq 3 ]; then
       echo "Error: Failed to validate kubectl binary."
+      rm -f kubectl kubectl.sha256
       return 1
     fi
     echo "Retrying..."
@@ -91,6 +96,20 @@ install_nvm(){
   PROFILE=/dev/null bash -c 'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash'
 }
 
+# Prompt user for HTTP/HTTPS Proxy
+if [ -z "$HTTP_PROXY" ] && [ -z "$HTTPS_PROXY" ]; then
+  read -p "Do you need to set an HTTP/HTTPS Proxy? (y/n): " proxy_required
+  if [[ $proxy_required == "y" ]]; then
+    read -p "Enter the HTTP Proxy: " http_proxy
+    read -p "Enter the HTTPS Proxy: " https_proxy
+    export HTTP_PROXY=$http_proxy
+    export HTTPS_PROXY=$https_proxy
+  fi
+fi
+
+if ! command -v brew &> /dev/null; then
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+fi
 
 sudo apt update
 if ! command -v git &> /dev/null; then
