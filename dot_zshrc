@@ -6,7 +6,7 @@
 export LANG=C.UTF-8
 
 sourceIfExists () {
-	test -f $1 && source $1
+  test -f $1 && source $1
 }
 sourceIfExists $HOME/.env
 
@@ -23,6 +23,10 @@ eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
 # Zplug is a plugin manager for zsh: https://github.com/zplug/zplug
 sourceIfExists "$HOME/.zplug/init.zsh"
+if ! command -v zplug &> /dev/null; then
+  curl -sL --proto-redir -all,https https://raw.githubusercontent.com/zplug/installer/master/installer.zsh | zsh
+  source ~/.zplug/init.zsh
+fi
 
 unsetopt beep extendedglob nomatch
 bindkey -e
@@ -60,10 +64,10 @@ zplug romkatv/powerlevel10k, as:theme, depth:1
 sourceIfExists "$HOME/.cargo/env"
 
 if ! zplug check --verbose; then
-    printf "Install? [y/N]: "
-    if read -q; then
-        echo; zplug install
-    fi
+  printf "Install? [y/N]: "
+  if read -q; then
+    echo; zplug install
+  fi
 fi
 
 zplug load
@@ -71,76 +75,76 @@ zplug load
 # eza is a command line tool for file management: https://github.com/eza-community/eza
 if  command -v eza &> /dev/null
 then
-		alias ls='eza'
-		alias ll='eza -lah --icons'
-		alias tree='eza -lah --icons --tree'
+  alias ls='eza'
+  alias ll='eza -lah --icons'
+  alias tree='eza -lah --icons --tree'
 fi
 
 # docker is a containerization platform: https://www.docker.com/
 if  command -v docker &> /dev/null
 then
-        # dive is a tool for exploring a docker image: https://github.com/wagoodman/dive
-		alias dive="docker run -ti --rm  -v /var/run/docker.sock:/var/run/docker.sock wagoodman/dive"
+  # dive is a tool for exploring a docker image: https://github.com/wagoodman/dive
+  alias dive="docker run -ti --rm  -v /var/run/docker.sock:/var/run/docker.sock wagoodman/dive"
 fi
 
 # nvim is a text editor: https://neovim.io/
 export PATH="$PATH:/opt/nvim-linux64/bin"
 if  command -v nvim &> /dev/null
 then
-		alias vim='nvim'
+  alias vim='nvim'
 fi
 
 # code-insiders is the insiders version of Visual Studio Code: https://code.visualstudio.com/insiders/
 if  command -v code-insiders &> /dev/null
 then
-    alias code='code-insiders'
+  alias code='code-insiders'
 fi
 
 # go is a programming language: https://golang.org/
 export PATH=$PATH:/usr/local/go/bin
 if command -v go &> /dev/null
 then
-    export PATH=$PATH:$HOME/go/bin # Add go bin directory to PATH, this is where go install puts binaries
-    export GOPRIVATE=gitlab.devops.telekom.de # Set the GOPRIVATE environment variable to enable private go modules
-    export GO111MODULE=on # Enable go modules
+  export PATH=$PATH:$HOME/go/bin # Add go bin directory to PATH, this is where go install puts binaries
+  export GOPRIVATE=gitlab.devops.telekom.de # Set the GOPRIVATE environment variable to enable private go modules
+  export GO111MODULE=on # Enable go modules
 fi
 
 # kubectl is a command line tool for kubernetes: https://kubernetes.io/docs/reference/kubectl/overview/
 if  command -v kubectl &> /dev/null
 then
-    source <(kubectl completion zsh)
-    alias k=kubectl
+  source <(kubectl completion zsh)
+  alias k=kubectl
 fi
 
 # kind is a tool for running local kubernetes clusters: https://kind.sigs.k8s.io/
 if command -v kind &> /dev/null
 then
-    source <(kind completion zsh)
+  source <(kind completion zsh)
 fi
 
 # helm is a package manager for kubernetes: https://helm.sh/
 if command -v helm &> /dev/null
 then
-    source <(helm completion zsh)
+  source <(helm completion zsh)
 fi
 
 # gh is the GitHub CLI: https://cli.github.com/
 if command -v gh &> /dev/null
 then
-    source <(gh completion -s zsh)
+  source <(gh completion -s zsh)
 fi
 
 # glab is a GitLab CLI: https://gitlab.com/gitlab-org/cli
 if command -v glab &> /dev/null
 then
-    autoload -U compinit; compinit
-    source <(glab completion -s zsh); compdef _glab glab
+  autoload -U compinit; compinit
+  source <(glab completion -s zsh); compdef _glab glab
 fi
 
 # chezmoi is a dotfile manager: https://www.chezmoi.io/
 if command -v chezmoi &> /dev/null
 then
-    source <(chezmoi completion zsh)
+  source <(chezmoi completion zsh)
 fi
 
 # nvm is a version manager for node.js: https://github.com/nvm-sh/nvm
