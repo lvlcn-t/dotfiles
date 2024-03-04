@@ -7,7 +7,7 @@ debug:
 		~/bin/chezmoi execute-template < ~/.local/share/chezmoi/scripts/run_once_before_install-deps.sh.tmpl > ~/.local/share/chezmoi/scripts/script.sh && \
 		chmod +x ~/.local/share/chezmoi/scripts/script.sh && \
 		~/.local/share/chezmoi/scripts/script.sh && \
-		chezmoi apply --verbose --force && \
+		~/bin/chezmoi apply --verbose --force && \
 		zsh"
 
 lint:

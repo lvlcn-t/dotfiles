@@ -7,7 +7,6 @@ RUN apt update && apt install -y sudo curl
 RUN useradd -m testuser && echo "testuser:testuser" | chpasswd && adduser testuser sudo
 RUN echo 'testuser ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
 
-
 USER testuser
 WORKDIR /home/testuser
 
