@@ -1,0 +1,5 @@
+{{- if .proxy.enabled }}
+use_proxy=on
+http_proxy={{ .proxy.http }}
+https_proxy={{ .proxy.https }}
+{{- end }}
