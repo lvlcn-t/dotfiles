@@ -8,11 +8,12 @@ This dotfiles collection includes configurations for Zsh, Git, wget and npm, alo
 
 - 💻 **dot_zshrc**: Customizes the Zsh shell environment, including aliases, functions, and shell options for improved command-line efficiency.
 - 🎨 **dot_p10k.zsh**: Configuration for the Powerlevel10k Zsh theme, enabling a highly customizable prompt that is both aesthetically pleasing and informative.
-- 🍺 **dot_brewfile**: A list of software to be installed via Homebrew, facilitating quick setup of new machines with necessary tools and applications.
 - 🌍 **dot_gitconfig**: Manages global Git settings, enhancing security and workflow efficiency. It configures the default branch name, enables conditional includes for separating personal and work-related configurations, and ensures all commits are signed. This setup provides a seamless transition between personal and professional projects while maintaining a high standard of code integrity.
 - 🏡 **dot_gitconfig-personal** & 💼 **dot_gitconfig-work**: Define specific Git configurations for personal and work contexts, automatically applied based on the repository's remote URL. This allows for a smooth workflow differentiation, keeping personal and professional contributions distinct and properly configured without manual switching.
+- 🗝️ **dot_netrc**: Includes credentials for accessing remote servers, allowing for automated authentication. I use it to store GitLab credentials for automated access to private repositories.
 - 📥 **dot_wgetrc**: Configuration for wget, customizing options for downloads.
 - 📦 **dot_npmrc**: npm configuration file for managing node package settings.
+- 🍺 **Brewfile**: A list of software to be installed via Homebrew, facilitating quick setup of new machines with necessary tools and applications.
 
 Feel free to explore and adapt these configurations to suit your own development needs and preferences. Happy coding! 😄
 
