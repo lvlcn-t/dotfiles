@@ -138,20 +138,25 @@ fi
 if command -v glab &> /dev/null
 then
   set_gitlab_env() {
+    netrc=$1
     local machine_line password_line host token
     while IFS= read -r line; do
       if [[ $line == machine* ]]; then
         machine_line=$line
-        elif [[ $line == *password* ]]; then
+      elif [[ $line == *password* ]]; then
         password_line=$line
         host=$(echo $machine_line | awk '{print $2}')
         token=$(echo $password_line | awk '{print $2}')
-        export GITLAB_HOST="https://$host"
-        export GITLAB_TOKEN="$token"
+        
+        if [[ $host == *gitlab* ]]; then
+          export GITLAB_HOST="https://$host"
+          export GITLAB_TOKEN="$token"
+          return
+        fi
       fi
-    done < ~/.netrc
+    done < $netrc
   }
-  set_gitlab_env
+  set_gitlab_env $HOME/.netrc
   
   autoload -U compinit; compinit
   source <(glab completion -s zsh); compdef _glab glab
