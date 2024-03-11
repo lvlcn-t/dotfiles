@@ -12,3 +12,9 @@ debug:
 
 lint:
 	pre-commit run -a
+
+chezmoidata-exclude:
+	git update-index --skip-worktree .chezmoidata.yaml
+
+chezmoidata-include:
+	git update-index --no-skip-worktree .chezmoidata.yaml
