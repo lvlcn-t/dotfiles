@@ -185,3 +185,13 @@ export https_proxy={{ .proxy.https }}
 export no_proxy={{ .proxy.noProxy }}
 {{- end }}
 
+{{- if and (eq .chezmoi.osRelease.id "ubuntu") (eq .chezmoi.osRelease.versionID "20.04") }}
+python_version="3.12"
+if command -v python${python_version} &> /dev/null
+then
+  alias python=python${python_version}
+  alias python3=python${python_version}
+  alias pip=pip${python_version}
+  alias pip3=pip${python_version}
+fi
+{{- end }}
