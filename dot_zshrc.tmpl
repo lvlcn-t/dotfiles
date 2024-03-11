@@ -137,6 +137,22 @@ fi
 # glab is a GitLab CLI: https://gitlab.com/gitlab-org/cli
 if command -v glab &> /dev/null
 then
+  set_gitlab_env() {
+    local machine_line password_line host token
+    while IFS= read -r line; do
+      if [[ $line == machine* ]]; then
+        machine_line=$line
+        elif [[ $line == *password* ]]; then
+        password_line=$line
+        host=$(echo $machine_line | awk '{print $2}')
+        token=$(echo $password_line | awk '{print $2}')
+        export GITLAB_HOST="https://$host"
+        export GITLAB_TOKEN="$token"
+      fi
+    done < ~/.netrc
+  }
+  set_gitlab_env
+  
   autoload -U compinit; compinit
   source <(glab completion -s zsh); compdef _glab glab
 fi
@@ -168,3 +184,4 @@ export http_proxy={{ .proxy.http }}
 export https_proxy={{ .proxy.https }}
 export no_proxy={{ .proxy.noProxy }}
 {{- end }}
+
