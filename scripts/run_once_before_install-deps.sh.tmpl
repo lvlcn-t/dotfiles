@@ -4,7 +4,7 @@
 # This script is consumed by chezmoi to install dependencies once before running the dotfiles.
 # It is idempotent and can be run multiple times without causing issues.
 
-{{ if eq .chezmoi.os "linux" -}}
+{{ if and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "ubuntu") -}}
 
 # keyring_installed checks if a keyring is installed
 keyring_installed() {
