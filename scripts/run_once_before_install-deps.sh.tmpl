@@ -130,6 +130,14 @@ fi
 if ! command -v nvm &> /dev/null; then
   PROFILE=/dev/null bash -c 'curl -fsSL -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash'
 fi
+
+python_version="3.12.0"
+if ! command -v python3 &> /dev/null || [[ $(python3 --version | awk '{print $2}') < $python_version ]]; then
+  sudo add-apt-repository ppa:deadsnakes/ppa -y -u > /dev/null 2>&1
+  python_version=$(echo $python_version | cut -d '.' -f 1-2)
+  install_or_update "python$python_version"
+fi
+
 {{- end }}
 
 # TODO: Implement the installation of dependencies for macOS / when implementing this, everything for linux can be also done with brew
