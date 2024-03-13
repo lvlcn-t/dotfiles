@@ -190,7 +190,7 @@ export https_proxy={{ .proxy.https }}
 export no_proxy={{ .proxy.noProxy }}
 {{- end }}
 
-{{- if and (eq .chezmoi.osRelease.id "ubuntu") (eq .chezmoi.osRelease.versionID "20.04") }}
+{{- if and (eq .chezmoi.osRelease.id "ubuntu") ( or (eq .chezmoi.osRelease.versionID "20.04") (eq .chezmoi.osRelease.versionID "22.04")) }}
 python_version="3.12"
 if command -v python${python_version} &> /dev/null
 then
