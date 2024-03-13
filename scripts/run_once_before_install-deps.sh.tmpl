@@ -95,7 +95,7 @@ fi
 go_version=$(curl -fsSL "https://go.dev/dl/?mode=json" | jq -r '.[0].version')
 if ! go version | grep -q "$go_version"; then
   curl -fsSL -LO "https://golang.org/dl/$go_version.linux-amd64.tar.gz"
-  sudo tar -C /usr/local -xzf "$go_version.linux-amd64.tar.gz"
+  sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf "$go_version.linux-amd64.tar.gz"
   rm "$go_version.linux-amd64.tar.gz"
 else
   echo "Go $go_version is already installed."
