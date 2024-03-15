@@ -143,7 +143,7 @@ then
     while IFS= read -r line; do
       if [[ $line == machine* ]]; then
         machine_line=$line
-      elif [[ $line == *password* ]]; then
+        elif [[ $line == *password* ]]; then
         password_line=$line
         host=$(echo $machine_line | awk '{print $2}')
         token=$(echo $password_line | awk '{print $2}')
@@ -166,6 +166,15 @@ fi
 if command -v chezmoi &> /dev/null
 then
   source <(chezmoi completion zsh)
+fi
+
+# az is the Azure CLI: https://docs.microsoft.com/en-us/cli/azure/
+if command -v az &> /dev/null
+then
+  if [ -f /etc/bash_completion.d/azure-cli ]; then
+    autoload -U +X bashcompinit && bashcompinit
+    source /etc/bash_completion.d/azure-cli
+  fi
 fi
 
 # nvm is a version manager for node.js: https://github.com/nvm-sh/nvm
