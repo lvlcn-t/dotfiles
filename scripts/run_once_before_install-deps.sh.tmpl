@@ -138,6 +138,19 @@ if ! command -v python3 &> /dev/null || [[ $(python3 --version | awk '{print $2}
   install_or_update "python$python_version"
 fi
 
+{{ if .installAdditionalDeps.azure -}}
+
+if ! command -v az &> /dev/null; then
+  curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+fi
+
+if ! command -v azd &> /dev/null; then
+  curl -fsSL https://aka.ms/install-azd.sh | bash
+fi
+
+{{- end }}
+
+
 {{- end }}
 
 # TODO: Implement the installation of dependencies for macOS / when implementing this, everything for linux can be also done with brew
