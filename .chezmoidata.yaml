@@ -9,4 +9,4 @@ proxy:
   noProxy: example.com
 
 installAdditionalDeps:
-  azure: true
+  azure: false
