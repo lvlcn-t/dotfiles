@@ -10,6 +10,10 @@ debug:
 		~/bin/chezmoi apply --verbose --force && \
 		zsh"
 
+create-install-deps-script:
+	chezmoi execute-template < ~/.local/share/chezmoi/scripts/run_once_before_install-deps.sh.tmpl > ./scripts/install-deps.sh
+	chmod +x ./scripts/install-deps.sh
+
 lint:
 	pre-commit run -a
 

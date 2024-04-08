@@ -1,3 +1,4 @@
 !config/chezmoi.toml
 chezmoi.toml
 .chezmoidata.yaml
+scripts/install-deps.sh
