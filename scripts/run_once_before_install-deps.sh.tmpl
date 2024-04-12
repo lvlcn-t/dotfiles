@@ -46,7 +46,7 @@ if ! command -v git &> /dev/null; then
   sudo add-apt-repository ppa:git-core/ppa -y -u > /dev/null 2>&1
 else
   installed_git_version=$(git --version | awk '{print $3}')
-  required_git_version="2.36.0"
+  required_git_version="2.43.2"
   
   if [[ $installed_git_version < $required_git_version ]]; then
     sudo add-apt-repository ppa:git-core/ppa -y -u > /dev/null 2>&1
