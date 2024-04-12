@@ -31,6 +31,7 @@ add_repo() {
   fi
 }
 
+{{- if not .proxy.enabled }}
 if [ -z "$HTTP_PROXY" ] && [ -z "$HTTPS_PROXY" ]; then
   read -p "Do you need to set an HTTP/HTTPS Proxy? (y/n): " proxy_required
   if [[ $proxy_required == "y" ]]; then
@@ -40,6 +41,10 @@ if [ -z "$HTTP_PROXY" ] && [ -z "$HTTPS_PROXY" ]; then
     export HTTPS_PROXY=$https_proxy
   fi
 fi
+{{- else }}
+export HTTP_PROXY={{ .proxy.http }}
+export HTTPS_PROXY={{ .proxy.https }}
+{{- end }}
 
 sudo apt update
 if ! command -v git &> /dev/null; then
