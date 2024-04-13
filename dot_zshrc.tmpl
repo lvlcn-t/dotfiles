@@ -72,6 +72,11 @@ fi
 
 zplug load
 
+# This autoloads the completion scripts for zsh
+mkdir -p ~/.zsh/completions
+fpath=(~/.zsh/completions $fpath)
+autoload -U compinit && compinit
+
 # eza is a command line tool for file management: https://github.com/eza-community/eza
 if  command -v eza &> /dev/null
 then
@@ -119,7 +124,7 @@ fi
 # kind is a tool for running local kubernetes clusters: https://kind.sigs.k8s.io/
 if command -v kind &> /dev/null
 then
-  source <(kind completion zsh)
+  kind completion zsh > ~/.zsh/completions/_kind
 fi
 
 # helm is a package manager for kubernetes: https://helm.sh/
@@ -131,7 +136,16 @@ fi
 # gh is the GitHub CLI: https://cli.github.com/
 if command -v gh &> /dev/null
 then
-  source <(gh completion -s zsh)
+  gh completion -s zsh > ~/.zsh/completions/_gh
+  if ! gh copilot --version &> /dev/null
+  then
+    gh extension install github/gh-copilot
+  fi
+    gh copilot alias zsh > ~/.zsh/completions/_gh-copilot
+    source ~/.zsh/completions/_gh-copilot
+    alias ghc='gh copilot'
+    # alias ghcs='gh copilot suggest'
+    # alias ghce='gh copilot explain'
 fi
 
 # glab is a GitLab CLI: https://gitlab.com/gitlab-org/cli
@@ -158,7 +172,6 @@ then
   }
   set_gitlab_env $HOME/.netrc
   
-  autoload -U compinit; compinit
   source <(glab completion -s zsh); compdef _glab glab
 fi
 
