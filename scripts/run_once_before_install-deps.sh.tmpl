@@ -143,6 +143,18 @@ if ! command -v python3 &> /dev/null || [[ $(python3 --version | awk '{print $2}
   install_or_update "python$python_version"
 fi
 
+{{ if .installAdditionalDeps.kubernetes -}}
+
+if ! command -v kind &> /dev/null; then
+  brew install kind
+fi
+
+if ! command -v k9s &> /dev/null; then
+  brew install k9s
+fi
+
+{{- end }}
+
 {{ if .installAdditionalDeps.azure -}}
 
 if ! command -v az &> /dev/null; then
