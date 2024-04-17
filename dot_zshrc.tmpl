@@ -137,12 +137,12 @@ fi
 if command -v gh &> /dev/null
 then
   gh completion -s zsh > ~/.zsh/completions/_gh
-  if ! gh copilot --version &> /dev/null
+  gh copilot --version &> /dev/null
+  if [ $? -ne 0 ];
   then
     gh extension install github/gh-copilot
   fi
-    gh copilot alias zsh > ~/.zsh/completions/_gh-copilot
-    source ~/.zsh/completions/_gh-copilot
+    eval "$(gh copilot alias -- zsh)"
     alias ghc='gh copilot'
     # alias ghcs='gh copilot suggest'
     # alias ghce='gh copilot explain'
