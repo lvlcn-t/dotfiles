@@ -173,6 +173,7 @@ then
   set_gitlab_env $HOME/.netrc
   
   source <(glab completion -s zsh); compdef _glab glab
+  alias gpsci='gp -o ci.skip'
 fi
 
 # chezmoi is a dotfile manager: https://www.chezmoi.io/
