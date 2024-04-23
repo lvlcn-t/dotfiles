@@ -6,6 +6,7 @@ README.md
 LICENSE
 Dockerfile
 Makefile
+run_once_before_install-deps.sh.tmpl
 
 config/
 config/**
