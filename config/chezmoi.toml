@@ -6,3 +6,17 @@ commitMessageTemplate = "{{ promptString \"Commit message\" }}"
 [edit]
 command = "code"
 args = "--wait"
+
+[data.netrc]
+url = "https://gitlab.com"
+token = ""
+
+[data.proxy]
+enabled = false
+http = "http://proxy.example.com:8080"
+https = "https://proxy.example.com:8080"
+noProxy = "example.com"
+
+[data.installAdditionalDeps]
+kubernetes = false
+azure = false
