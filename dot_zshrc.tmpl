@@ -214,12 +214,29 @@ export no_proxy={{ .proxy.noProxy }}
 {{- end }}
 
 {{- if and (eq .chezmoi.osRelease.id "ubuntu") ( or (eq .chezmoi.osRelease.versionID "20.04") (eq .chezmoi.osRelease.versionID "22.04")) }}
-python_version="3.12"
-if command -v python${python_version} &> /dev/null
+if ! command -v pyenv &> /dev/null
 then
-  alias python=python${python_version}
-  alias python3=python${python_version}
-  alias pip=pip${python_version}
-  alias pip3=pip${python_version}
+  if [ -d "$HOME/.pyenv" ]; then
+    export PYENV_ROOT="$HOME/.pyenv"
+    [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+    eval "$(pyenv init -)"
+    eval "$(pyenv virtualenv-init -)"
+  fi
 fi
+
+python_version="3.12"
+if ! command -v python${python_version} &> /dev/null
+then
+  if command -v pyenv &> /dev/null
+  then
+    pyenv install -v ${python_version}
+  fi
+fi
+
+alias python=python${python_version}
+alias python3=python${python_version}
+alias pip=pip${python_version}
+alias pip3=pip${python_version}
+
 {{- end }}
+

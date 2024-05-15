@@ -136,12 +136,17 @@ if ! command -v nvm &> /dev/null; then
   PROFILE=/dev/null bash -c 'curl -fsSL -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash'
 fi
 
-python_version="3.12.0"
-if ! command -v python3 &> /dev/null || [[ $(python3 --version | awk '{print $2}') < $python_version ]]; then
-  sudo add-apt-repository ppa:deadsnakes/ppa -y -u > /dev/null 2>&1
-  python_version=$(echo $python_version | cut -d '.' -f 1-2)
-  install_or_update "python$python_version"
+{{ if .installAdditionalDeps.python -}}
+
+if ! command -v pyenv &> /dev/null; then
+  necessary_packages=(make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python3-openssl)
+  for package in "${necessary_packages[@]}"; do
+    install_or_update "$package"
+  done
+  curl -fsSL https://pyenv.run | bash
 fi
+
+{{- end }}
 
 {{ if .installAdditionalDeps.kubernetes -}}
 

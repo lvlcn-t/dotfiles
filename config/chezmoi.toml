@@ -18,5 +18,6 @@ https = "https://proxy.example.com:8080"
 noProxy = "example.com"
 
 [data.installAdditionalDeps]
+python = true
 kubernetes = false
 azure = false

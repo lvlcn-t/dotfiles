@@ -9,5 +9,6 @@ proxy:
   noProxy: example.com
 
 installAdditionalDeps:
+  python: true
   kubernetes: false
   azure: false
