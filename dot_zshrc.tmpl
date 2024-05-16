@@ -191,6 +191,12 @@ then
   fi
 fi
 
+if command -v azd &> /dev/null
+then
+  source <(azd completion zsh)
+  export AZURE_DEV_COLLECT_TELEMETRY="no"
+fi
+
 # nvm is a version manager for node.js: https://github.com/nvm-sh/nvm
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
