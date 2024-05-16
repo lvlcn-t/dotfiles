@@ -146,6 +146,24 @@ if ! command -v pyenv &> /dev/null; then
   curl -fsSL https://pyenv.run | bash
 fi
 
+python_version="3.12"
+if command -v pyenv &> /dev/null; then
+  export PYENV_ROOT="$HOME/.pyenv"
+  [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+  eval "$(pyenv init -)"
+  eval "$(pyenv virtualenv-init -)"
+  pyenv install $python_version && pyenv global $python_version
+fi
+
+if ! command -v pipx &> /dev/null; then
+  brew install pipx
+  pipx ensurepath
+fi
+
+if ! command -v poetry &> /dev/null; then
+  pipx install poetry
+fi
+
 {{- end }}
 
 {{ if .installAdditionalDeps.kubernetes -}}
