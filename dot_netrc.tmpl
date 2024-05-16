@@ -1,4 +1,4 @@
-{{- range .netrc.machines }}
+{{ range .netrc.machines -}}
 machine {{ .url }}
     {{- with .username }}
     login {{ . }}
@@ -7,4 +7,4 @@ machine {{ .url }}
     {{- end }}
     password {{ .token }}
 
-{{- end }}
+{{ end -}}
