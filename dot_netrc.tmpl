@@ -1,3 +1,10 @@
-machine {{ .netrc.url }}
+{{- range .netrc.machines }}
+machine {{ .url }}
+    {{- with .username }}
+    login {{ . }}
+    {{- else }}
     login __token__
-    password {{ .netrc.token }}
+    {{- end }}
+    password {{ .token }}
+
+{{- end }}

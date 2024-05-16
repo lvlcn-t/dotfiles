@@ -1,6 +1,11 @@
 netrc:
-  url: https://gitlab.com
-  token: glpat-xxxxxxx
+  machines:
+    - url: https://gitlab.com
+      username: __token__
+      token: glpat-xxxxxxx
+    - url: https://github.com
+      username: __token__
+      token: ghp_xxxxxxx
 
 proxy:
   enabled: false

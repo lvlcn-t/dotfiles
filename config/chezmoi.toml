@@ -8,8 +8,15 @@ command = "code"
 args = "--wait"
 
 [data.netrc]
+[[data.netrc.machines]]
 url = "https://gitlab.com"
-token = ""
+username = "__token__"
+token = "glpat-xxxxxxx"
+
+[[data.netrc.machines]]
+url = "https://github.com"
+username = "__token__"
+token = "ghp_xxxxxxx"
 
 [data.proxy]
 enabled = false
@@ -19,5 +26,5 @@ noProxy = "example.com"
 
 [data.installAdditionalDeps]
 python = true
-kubernetes = false
+kubernetes = true
 azure = false
