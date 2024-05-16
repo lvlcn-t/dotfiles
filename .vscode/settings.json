@@ -2,5 +2,9 @@
     "files.associations": {
         "dot_zshrc.tmpl": "shellscript",
         "*.sh.tmpl": "shellscript"
+    },
+    "[shellscript]": {
+        "editor.indentSize": 2,
+        "editor.formatOnSave": true,
     }
 }
