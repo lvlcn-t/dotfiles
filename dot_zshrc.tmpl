@@ -232,18 +232,14 @@ then
 fi
 
 python_version="3.12"
-if ! command -v python${python_version} &> /dev/null
+if ! python3 --version | grep -q ${python_version} &> /dev/null
 then
   if command -v pyenv &> /dev/null
   then
     pyenv install -v ${python_version}
+    pyenv global ${python_version}
   fi
 fi
-
-alias python=python${python_version}
-alias python3=python${python_version}
-alias pip=pip${python_version}
-alias pip3=pip${python_version}
 
 {{- end }}
 
