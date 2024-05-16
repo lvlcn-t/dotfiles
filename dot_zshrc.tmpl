@@ -75,7 +75,8 @@ zplug load
 # This autoloads the completion scripts for zsh
 mkdir -p ~/.zsh/completions
 fpath=(~/.zsh/completions $fpath)
-autoload -U compinit && compinit
+fpath+=~/.zfunc
+autoload -Uz compinit && compinit
 
 # eza is a command line tool for file management: https://github.com/eza-community/eza
 if  command -v eza &> /dev/null
