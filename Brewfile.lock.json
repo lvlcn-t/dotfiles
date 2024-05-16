@@ -2,7 +2,7 @@
   "entries": {
     "tap": {
       "bufbuild/buf": {
-        "revision": "c4bca27f76004ba809654a0074e97758f33602fe"
+        "revision": "a31a554520e7bf4f038cb9e4bd2ba74db0a32075"
       },
       "derailed/k9s": {
         "revision": "ed4fc61db35949472e4112c58d648b8fa6a52988"
@@ -11,10 +11,10 @@
         "revision": "6a4e6f91c9bf3717feb4a35c37f5cb97ff520be3"
       },
       "homebrew/bundle": {
-        "revision": "fb26c695c48a7be9f2c77c4a48bcbdd369301700"
+        "revision": "0fe5895d24e8a64fc9ddff63eb5c6680164a432d"
       },
       "homebrew/cask-fonts": {
-        "revision": "5ea3139dcb6d9ca2dd69ca1fe7f878d1c72824ad"
+        "revision": "0ed20f35d21ebc3f4f829689b101078718ad5ce1"
       },
       "jandedobbeleer/oh-my-posh": {
         "revision": "8620ea801da465dceb0c485f1e61c6a26c2aeb8c"
