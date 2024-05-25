@@ -220,7 +220,8 @@ export https_proxy={{ .proxy.https }}
 export no_proxy={{ .proxy.noProxy }}
 {{- end }}
 
-{{- if and (eq .chezmoi.osRelease.id "ubuntu") ( or (eq .chezmoi.osRelease.versionID "20.04") (eq .chezmoi.osRelease.versionID "22.04")) }}
+{{- if .machine.packages.languages.python }}
+
 if ! command -v pyenv &> /dev/null
 then
   if [ -d "$HOME/.pyenv" ]; then
@@ -243,3 +244,7 @@ fi
 
 {{- end }}
 
+if command -v yt-dlp &> /dev/null
+then
+  alias yt-mp3='yt-dlp -x --audio-format mp3'
+fi

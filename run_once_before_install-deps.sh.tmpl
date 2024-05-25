@@ -4,7 +4,7 @@
 # This script is consumed by chezmoi to install dependencies once before running the dotfiles.
 # It is idempotent and can be run multiple times without causing issues.
 
-{{ if and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "ubuntu") -}}
+{{- if and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "ubuntu") }}
 
 # keyring_installed checks if a keyring is installed
 keyring_installed() {
@@ -31,7 +31,7 @@ add_repo() {
   fi
 }
 
-{{- if not .proxy.enabled }}
+{{- if not .machine.proxy.enabled }}
 if [ -z "$HTTP_PROXY" ] && [ -z "$HTTPS_PROXY" ]; then
   read -p "Do you need to set an HTTP/HTTPS Proxy? (y/n): " proxy_required
   if [[ $proxy_required == "y" ]]; then
@@ -42,11 +42,16 @@ if [ -z "$HTTP_PROXY" ] && [ -z "$HTTPS_PROXY" ]; then
   fi
 fi
 {{- else }}
-export HTTP_PROXY={{ .proxy.http }}
-export HTTPS_PROXY={{ .proxy.https }}
+export HTTP_PROXY={{ .machine.proxy.http }}
+export HTTPS_PROXY={{ .machine.proxy.https }}
+export http_proxy={{ .machine.proxy.http }}
+export https_proxy={{ .machine.proxy.https }}
+export NO_PROXY={{ .machine.proxy.noProxy }}
+export no_proxy={{ .machine.proxy.noProxy }}
 {{- end }}
 
-sudo apt update
+sudo apt update && sudo apt upgrade -qq -y
+
 if ! command -v git &> /dev/null; then
   sudo add-apt-repository ppa:git-core/ppa -y -u > /dev/null 2>&1
 else
@@ -63,39 +68,15 @@ for package in "${necessary_packages[@]}"; do
   install_or_update "$package"
 done
 
-# Install brew
 if ! command -v brew &> /dev/null; then
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 brew bundle install --file={{ .chezmoi.sourceDir }}/Brewfile
 
-# Create the keyrings directory
 sudo install -m 0755 -d /etc/apt/keyrings
 
-if ! command -v eza &> /dev/null; then
-  if ! keyring_installed "eza.gpg"; then
-    wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | sudo gpg --dearmor -o /etc/apt/keyrings/eza.gpg
-  fi
-  add_repo "eza" "eza.gpg" "http://deb.gierens.de" "stable main"
-  install_or_update "eza"
-fi
-
-if ! command -v docker &> /dev/null; then
-  if ! keyring_installed "docker.asc"; then
-    sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc && sudo chmod a+r /etc/apt/keyrings/docker.asc
-  fi
-  add_repo "docker" "docker.asc" "https://download.docker.com/linux/ubuntu" "$(. /etc/os-release && echo "$VERSION_CODENAME") stable"
-  docker_packages=(docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin)
-  for package in "${docker_packages[@]}"; do
-    install_or_update "$package"
-  done
-fi
-
-if ! command -v nvim &> /dev/null; then
-  sudo add-apt-repository ppa:neovim-ppa/stable -y -u > /dev/null 2>&1
-  install_or_update "neovim"
-fi
+{{- if .machine.packages.languages.go }}
 
 go_version=$(curl -fsSL "https://go.dev/dl/?mode=json" | jq -r '.[0].version')
 if ! go version | grep -q "$go_version"; then
@@ -106,40 +87,24 @@ else
   echo "Go $go_version is already installed."
 fi
 
-if ! command -v kubectl &> /dev/null; then
-  curl -fsSL -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-  # validate_checksum "kubectl" "https://dl.k8s.io/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"
-  if [ $? -eq 0 ]; then
-    sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
-  else
-    echo "Kubectl checksum validation failed. kubectl was not installed."
-  fi
-  rm kubectl
+{{- end }}
+
+{{- if .machine.packages.languages.rust }}
+
+if ! command -v rustup &> /dev/null; then
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 fi
 
-if ! command -v helm &> /dev/null; then
-  curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
-  chmod 700 get_helm.sh
-  ./get_helm.sh
-  rm get_helm.sh
-fi
+{{- end }}
 
-if ! command -v gh &> /dev/null; then
-  if ! keyring_installed "github-cli.gpg"; then
-    wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /etc/apt/keyrings/github-cli.gpg && sudo chmod go+r /etc/apt/keyrings/github-cli.gpg
-  fi
-  add_repo "github-cli" "github-cli.gpg" "https://cli.github.com/packages" "stable main"
-  install_or_update "gh"
-fi
-
-if ! command -v nvm &> /dev/null; then
-  PROFILE=/dev/null bash -c 'curl -fsSL -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash'
-fi
-
-{{ if .installAdditionalDeps.python -}}
+{{- if .machine.packages.languages.python }}
 
 if ! command -v pyenv &> /dev/null; then
-  necessary_packages=(make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python3-openssl)
+  necessary_packages=(
+    make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev 
+    libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils 
+    tk-dev libffi-dev liblzma-dev python3-openssl
+  )
   for package in "${necessary_packages[@]}"; do
     install_or_update "$package"
   done
@@ -166,7 +131,47 @@ fi
 
 {{- end }}
 
-{{ if .installAdditionalDeps.kubernetes -}}
+{{- if .machine.packages.languages.node }}
+
+if ! command -v nvm &> /dev/null; then
+  PROFILE=/dev/null bash -c 'curl -fsSL -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash'
+fi
+
+{{- end }}
+
+{{- if .machine.packages.devops.docker }}
+
+if ! command -v docker &> /dev/null; then
+  if ! keyring_installed "docker.asc"; then
+    sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc && sudo chmod a+r /etc/apt/keyrings/docker.asc
+  fi
+  add_repo "docker" "docker.asc" "https://download.docker.com/linux/ubuntu" "$(. /etc/os-release && echo "$VERSION_CODENAME") stable"
+  docker_packages=(docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin)
+  for package in "${docker_packages[@]}"; do
+    install_or_update "$package"
+  done
+fi
+
+{{- end }}
+
+{{- if .machine.packages.devops.kubernetes }}
+
+if ! command -v kubectl &> /dev/null; then
+  curl -fsSL -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+  if [ $? -eq 0 ]; then
+    sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+  else
+    echo "Kubectl checksum validation failed. kubectl was not installed."
+  fi
+  rm kubectl
+fi
+
+if ! command -v helm &> /dev/null; then
+  curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+  chmod 700 get_helm.sh
+  ./get_helm.sh
+  rm get_helm.sh
+fi
 
 if ! command -v kind &> /dev/null; then
   brew install kind
@@ -178,7 +183,23 @@ fi
 
 {{- end }}
 
-{{ if .installAdditionalDeps.azure -}}
+{{- if .machine.packages.cloud.aws }}
+
+if ! command -v aws &> /dev/null; then
+  echo "installation of aws not supported yet"
+fi
+
+{{- end }}
+
+{{- if .machine.packages.cloud.gcp }}
+
+if ! command -v gcloud &> /dev/null; then
+  echo "installation of gcp not supported yet"
+fi
+
+{{- end }}
+
+{{- if .machine.packages.cloud.azure }}
 
 if ! command -v az &> /dev/null; then
   curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
@@ -190,7 +211,75 @@ fi
 
 {{- end }}
 
+{{- if .machine.packages.tools.eza }}
+if ! command -v eza &> /dev/null; then
+  if ! keyring_installed "eza.gpg"; then
+    wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | sudo gpg --dearmor -o /etc/apt/keyrings/eza.gpg
+  fi
+  add_repo "eza" "eza.gpg" "http://deb.gierens.de" "stable main"
+  install_or_update "eza"
+fi
+{{- end }}
+
+{{- if .machine.packages.tools.gh }}
+
+if ! command -v gh &> /dev/null; then
+  if ! keyring_installed "github-cli.gpg"; then
+    wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /etc/apt/keyrings/github-cli.gpg && sudo chmod go+r /etc/apt/keyrings/github-cli.gpg
+  fi
+  add_repo "github-cli" "github-cli.gpg" "https://cli.github.com/packages" "stable main"
+  install_or_update "gh"
+fi
 
 {{- end }}
 
-# TODO: Implement the installation of dependencies for macOS / when implementing this, everything for linux can be also done with brew
+{{- if .machine.packages.tools.glab }}
+
+if ! command -v glab &> /dev/null; then
+  brew install glab
+fi
+
+{{- end }}
+
+{{- if .machine.packages.tools.ytdlp }}
+
+if ! command -v yt-dlp &> /dev/null; then
+  brew install yt-dlp
+fi
+
+{{- end }}
+
+{{- if .machine.packages.tools.ffmpeg }}
+
+if ! command -v ffmpeg &> /dev/null; then
+  install_or_update "ffmpeg"
+fi
+
+{{- end }}
+
+{{- if .machine.packages.editors.nvim }}
+
+if ! command -v nvim &> /dev/null; then
+  sudo add-apt-repository ppa:neovim-ppa/stable -y -u > /dev/null 2>&1
+  install_or_update "neovim"
+fi
+
+{{- end }}
+
+{{- if .machine.packages.browsers.firefox }}
+
+if ! command -v firefox &> /dev/null; then
+  install_or_update "firefox"
+fi
+
+{{- end }}
+
+{{- if .machine.packages.browsers.chromium }}
+
+if ! command -v chromium &> /dev/null; then
+  install_or_update "chromium"
+fi
+
+{{- end }}
+
+{{- end }}

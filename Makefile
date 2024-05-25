@@ -13,7 +13,8 @@ debug:
 
 .PHONY: gen-install-script
 gen-install-script:
-	chezmoi execute-template < ~/.local/share/chezmoi/scripts/run_once_before_install-deps.sh.tmpl > ./scripts/install-deps.sh
+	mkdir -p ./scripts
+	chezmoi execute-template < ~/.local/share/chezmoi/run_once_before_install-deps.sh.tmpl > ./scripts/install-deps.sh
 	chmod +x ./scripts/install-deps.sh
 
 .PHONY: lint

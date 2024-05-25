@@ -18,13 +18,34 @@ url = "https://github.com"
 username = "__token__"
 token = "ghp_xxxxxxx"
 
-[data.proxy]
+[data.machine.proxy]
 enabled = false
 http = "http://proxy.example.com:8080"
 https = "https://proxy.example.com:8080"
 noProxy = "example.com"
 
-[data.installAdditionalDeps]
+[data.machine.packages.languages]
+go = true
 python = true
+rust = true
+node = true
+
+[data.machine.packages.devops]
+docker = true
 kubernetes = true
+
+[data.machine.packages.cloud]
+aws = false
 azure = false
+gcp = false
+
+[data.machine.packages.tools]
+ytdlp = false
+ffmpeg = false
+
+[data.machine.packages.editors]
+nvim = true
+
+[data.machine.packages.browsers]
+firefox = false
+chromium = false

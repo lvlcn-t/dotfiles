@@ -7,13 +7,39 @@ netrc:
       username: __token__
       token: ghp_xxxxxxx
 
-proxy:
-  enabled: false
-  http: http://proxy.example.com:8080
-  https: https://proxy.example.com:8080
-  noProxy: example.com
+machine:
+  proxy:
+    enabled: false
+    http: http://proxy.example.com:8080
+    https: https://proxy.example.com:8080
+    noProxy: example.com
 
-installAdditionalDeps:
-  python: true
-  kubernetes: false
-  azure: false
+  packages:
+    languages:
+      go: true
+      python: true
+      rust: true
+      node: true
+
+    devops:
+      docker: true
+      kubernetes: false
+
+    cloud:
+      aws: false
+      azure: false
+      gcp: false
+
+    tools:
+      eza: true
+      gh: true
+      glab: true
+      ytdlp: false
+      ffmpeg: false
+
+    editors:
+      nvim: true
+
+    browsers:
+      firefox: false
+      chromium: false
