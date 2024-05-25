@@ -32,3 +32,8 @@ chezmoidata-include:
 .PHONY: append-chezmoi-config
 append-chezmoi-config:
 	cat config/chezmoi.toml >> ~/.config/chezmoi/chezmoi.toml
+
+.PHONY: bump-brewfile
+bump-brewfile:
+	brew bundle dump --force --file=./Brewfile
+	# sed -i '/brew "python@3.12"/d; /brew "yt-dlp"/d; /brew "glab"/d' Brewfile
