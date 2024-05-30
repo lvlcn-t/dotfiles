@@ -57,13 +57,20 @@ if ask_yes_no "Do you want to configure netrc machines?"; then
 fi
 
 echo "[data.machine.proxy]" >>"$temp_file"
-enabled=$(ask_yes_no "Enable proxy?")
+if ask_yes_no "Enable proxy?"; then
+    enabled=true
+    http=$(ask_value "HTTP Proxy")
+    https=$(ask_value "HTTPS Proxy")
+    noProxy=$(ask_value "No Proxy")
+else
+    enabled=false
+    http=""
+    https=""
+    noProxy=""
+fi
 echo "enabled = $enabled" >>"$temp_file"
-http=$(ask_value "HTTP Proxy")
 echo "http = \"$http\"" >>"$temp_file"
-https=$(ask_value "HTTPS Proxy")
 echo "https = \"$https\"" >>"$temp_file"
-noProxy=$(ask_value "No Proxy")
 echo "noProxy = \"$noProxy\"" >>"$temp_file"
 
 # ask_packages asks the user for a yes or no answer for each package
