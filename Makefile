@@ -13,7 +13,7 @@ install: configure apply ## Installs the dotfiles on your system
 	@echo "Installation complete! Have fun!"
 
 .PHONY: configure
-configure: config ## Configure the dotfile configurations
+configure: ## Configure the dotfile configurations
 	@echo "Let's configure the dotfiles to your preferences..."
 	@chmod +x ./scripts/configure.sh
 	@./scripts/configure.sh
