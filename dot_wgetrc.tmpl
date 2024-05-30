@@ -1,5 +1,5 @@
-{{- if .proxy.enabled }}
+{{- if .machine.proxy.enabled }}
 use_proxy=on
-http_proxy={{ .proxy.http }}
-https_proxy={{ .proxy.https }}
+http_proxy={{ .machine.proxy.http }}
+https_proxy={{ .machine.proxy.https }}
 {{- end }}

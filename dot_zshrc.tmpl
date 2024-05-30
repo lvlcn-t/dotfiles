@@ -215,13 +215,13 @@ case ":$PATH:" in
 esac
 # pnpm end
 
-{{- if .proxy.enabled }}
-export HTTP_PROXY={{ .proxy.http }}
-export HTTPS_PROXY={{ .proxy.https }}
-export NO_PROXY={{ .proxy.noProxy }}
-export http_proxy={{ .proxy.http }}
-export https_proxy={{ .proxy.https }}
-export no_proxy={{ .proxy.noProxy }}
+{{- if .machine.proxy.enabled }}
+export HTTP_PROXY={{ .machine.proxy.http }}
+export HTTPS_PROXY={{ .machine.proxy.https }}
+export NO_PROXY={{ .machine.proxy.noProxy }}
+export http_proxy={{ .machine.proxy.http }}
+export https_proxy={{ .machine.proxy.https }}
+export no_proxy={{ .machine.proxy.noProxy }}
 {{- end }}
 
 {{- if .machine.packages.languages.python }}

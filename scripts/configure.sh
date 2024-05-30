@@ -42,6 +42,7 @@ temp_file=$(mktemp)
 echo "[data.netrc]" >"$temp_file"
 if ask_yes_no "Do you want to configure netrc machines?"; then
     while true; do
+        echo "" >>"$temp_file"
         echo "[[data.netrc.machines]]" >>"$temp_file"
         url=$(ask_value "Enter URL")
         username=$(ask_value "Enter Username")
@@ -56,6 +57,7 @@ if ask_yes_no "Do you want to configure netrc machines?"; then
     done
 fi
 
+echo "" >>"$temp_file"
 echo "[data.machine.proxy]" >>"$temp_file"
 if ask_yes_no "Enable proxy?"; then
     enabled=true
@@ -64,9 +66,9 @@ if ask_yes_no "Enable proxy?"; then
     noProxy=$(ask_value "No Proxy")
 else
     enabled=false
-    http=""
-    https=""
-    noProxy=""
+    http="http://proxy.example.com:8080"
+    https="https://proxy.example.com:8080"
+    noProxy="example.com"
 fi
 echo "enabled = $enabled" >>"$temp_file"
 echo "http = \"$http\"" >>"$temp_file"
@@ -77,6 +79,7 @@ echo "noProxy = \"$noProxy\"" >>"$temp_file"
 ask_packages() {
     package_section=$1
     shift
+    echo "" >>"$temp_file"
     echo "[$package_section]" >>"$temp_file"
     for package in "$@"; do
         if ask_yes_no "Do you want to install $package?"; then
