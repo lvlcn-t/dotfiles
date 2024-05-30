@@ -52,12 +52,10 @@ If you prefer to adjust the [configurations](./.chezmoidata.yaml) before applyin
     chezmoi cd
     ```
 
-4. **Adjust the [configurations](./.chezmoidata.yaml) as needed.**
-
-5. **Apply the dotfiles to your system:**
+4. **Start the customization and application process:**
 
     ```bash
-    chezmoi apply
+    make install
     ```
 
 That's it! Your dotfiles are now installed and ready to use. Enjoy your new development environment! 🎉
