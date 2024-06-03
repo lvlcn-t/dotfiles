@@ -237,8 +237,11 @@ if ! python3 --version | grep -q ${python_version} &> /dev/null
 then
   if command -v pyenv &> /dev/null
   then
-    pyenv install -v ${python_version}
     pyenv global ${python_version}
+    if [ $? -ne 0 ]; then
+      pyenv install -v ${python_version}
+      pyenv global ${python_version}
+    fi
   fi
 fi
 
