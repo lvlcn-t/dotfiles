@@ -198,6 +198,11 @@ then
   export AZURE_DEV_COLLECT_TELEMETRY="no"
 fi
 
+if command -v func &> /dev/null
+then
+  export FUNCTIONS_CORE_TOOLS_TELEMETRY_OPTOUT="true"
+fi
+
 # nvm is a version manager for node.js: https://github.com/nvm-sh/nvm
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"

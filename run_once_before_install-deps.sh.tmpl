@@ -213,6 +213,11 @@ if ! command -v azd &> /dev/null; then
   curl -fsSL https://aka.ms/install-azd.sh | bash
 fi
 
+if ! command -v func &> /dev/null; then
+  brew tap azure/functions
+  brew install azure-functions-core-tools@4
+fi
+
 {{- end }}
 
 {{- if .machine.packages.tools.eza }}
