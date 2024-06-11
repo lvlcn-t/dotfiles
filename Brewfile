@@ -1,3 +1,4 @@
+tap "azure/functions"
 tap "bufbuild/buf"
 tap "derailed/k9s"
 tap "goreleaser/tap"
