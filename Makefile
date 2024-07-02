@@ -43,7 +43,7 @@ bump-deps: ## Bump the dependencies
 	@git add ./Brewfile ./Brewfile.lock.json || true # ignore if there are no changes
 	@git branch | grep -q 'chore/bump-deps' && git checkout chore/bump-deps || git checkout -b chore/bump-deps
 	@git commit -m "chore: bump dependencies" || true # ignore if there are no changes
-	@git push origin chore/bump-deps || true # ignore if there are no changes
+	@git push --force -u origin chore/bump-deps || true # ignore if there are no changes
 	@if [ -z "$(shell gh pr list --state open --base main --head chore/bump-deps)" ]; then \
 		gh pr create --base main --head chore/bump-deps --title "chore: bump dependencies" --body "Bumps the dependencies"; \
 	fi
