@@ -58,7 +58,3 @@ debug: ## Debugs the dotfiles
 		~/.local/share/chezmoi/scripts/script.sh && \
 		~/bin/chezmoi apply --verbose --force && \
 		zsh"
-
-.PHONY: lint
-lint: ## Run the linter (secret detection)
-	@pre-commit run -a
