@@ -55,6 +55,7 @@ If you prefer to adjust the [configurations](./.chezmoidata.yaml) before applyin
 4. **Start the customization and application process:**
 
     ```bash
+    sudo apt install build-essential -y
     make install
     ```
 
