@@ -87,6 +87,10 @@ else
   echo "Go $go_version is already installed."
 fi
 
+if ! command -v golangci-lint &> /dev/null; then
+  brew install golangci-lint
+fi
+
 {{- end }}
 
 {{- if .machine.packages.languages.rust }}
