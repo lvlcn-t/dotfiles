@@ -17,6 +17,9 @@ setopt appendhistory
 
 # Brew is a package manager for macOS and Linux: https://brew.sh/
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+if command -v brew &> /dev/null; then
+  alias du-brew='du -sch $(brew --cellar)/*/* | sed "s|$(brew --cellar)/\([^/]*\)/.*|\1|" | sort -k1h'
+fi
 
 # Load the default .profile
 [[ -e ~/.profile ]] && emulate sh -c 'source ~/.profile'
@@ -175,6 +178,14 @@ then
   
   source <(glab completion -s zsh); compdef _glab glab
   alias gpsci='gp -o ci.skip'
+fi
+
+if command -v gitlab-ci-local &> /dev/null
+then
+  export GCL_NEEDS='true'
+  # export GCL_FILE='.gitlab-ci-local.yml'
+  # export GCL_VARIABLE="IMAGE=alpine:latest"
+  alias gci='gitlab-ci-local'
 fi
 
 # chezmoi is a dotfile manager: https://www.chezmoi.io/
