@@ -40,7 +40,7 @@ pre-install: ## Install the pre-requisites
 bump-deps: ## Bump the dependencies
 	@brew bundle dump --force --file=./Brewfile
 	@brew bundle install --file=./Brewfile
-	@git add ./Brewfile ./Brewfile.lock.json || true # ignore if there are no changes
+	@git add ./Brewfile || true # ignore if there are no changes
 	@git branch | grep -q 'chore/bump-deps' && git checkout chore/bump-deps || git checkout -b chore/bump-deps
 	@git commit -m "chore: bump dependencies" || true # ignore if there are no changes
 	@git push --force -u origin chore/bump-deps || true # ignore if there are no changes
