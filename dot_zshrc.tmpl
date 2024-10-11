@@ -80,6 +80,7 @@ mkdir -p ~/.zsh/completions
 fpath=(~/.zsh/completions $fpath)
 fpath+=~/.zfunc
 autoload -Uz compinit && compinit
+[ -f $HOMEBREW_PREFIX/etc/profile.d/autojump.sh ] && . $HOMEBREW_PREFIX/etc/profile.d/autojump.sh
 
 # eza is a command line tool for file management: https://github.com/eza-community/eza
 if  command -v eza &> /dev/null
@@ -251,7 +252,7 @@ fi
 python_version="3.12"
 if ! python3 --version | grep -q ${python_version} &> /dev/null
 then
-  if command -v pyenv &> /dev/null
+  if  command -v pyenv &> /dev/null
   then
     pyenv global ${python_version}
     if [ $? -ne 0 ]; then

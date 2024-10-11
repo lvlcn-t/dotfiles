@@ -189,6 +189,10 @@ if ! command -v k9s &> /dev/null; then
   brew install k9s
 fi
 
+if ! command -v kcl &> /dev/null; then
+  wget -q https://kcl-lang.io/script/install-cli.sh -O - | /bin/bash
+fi
+
 {{- end }}
 
 {{- if .machine.packages.cloud.aws }}
@@ -231,6 +235,10 @@ if ! command -v eza &> /dev/null; then
   fi
   add_repo "eza" "eza.gpg" "http://deb.gierens.de" "stable main"
   install_or_update "eza"
+fi
+
+if ! command -v autojump &> /dev/null; then
+  brew install autojump
 fi
 {{- end }}
 
