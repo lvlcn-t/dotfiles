@@ -56,6 +56,7 @@ if ! command -v git &> /dev/null; then
   sudo add-apt-repository ppa:git-core/ppa -y -u > /dev/null 2>&1
 else
   installed_git_version=$(git --version | awk '{print $3}')
+  # Required git version for includeIf directive in gitconfig
   required_git_version="2.43.2"
   
   if [[ $installed_git_version < $required_git_version ]]; then
@@ -75,6 +76,8 @@ eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 brew bundle install --file={{ .chezmoi.sourceDir }}/Brewfile
 
 sudo install -m 0755 -d /etc/apt/keyrings
+
+brew install git-town
 
 {{- if .machine.packages.languages.go }}
 
