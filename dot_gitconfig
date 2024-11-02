@@ -1,6 +1,10 @@
 [init]
     defaultBranch = main
 
+[user]
+	name = lvlcn-t
+	email = 75443136+lvlcn-t@users.noreply.github.com
+
 [includeIf "hasconfig:remote.*.url:git@github.com*/**"]
     path = .gitconfig-personal
 
