@@ -168,6 +168,10 @@ case ":$PATH:" in
 *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 
+if command -v kubectl-krew &>/dev/null; then
+  export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
+fi
+
 # Disable telemetry for the Azure Developer CLI
 if command -v azd &>/dev/null; then
   export AZURE_DEV_COLLECT_TELEMETRY="no"

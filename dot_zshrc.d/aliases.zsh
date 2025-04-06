@@ -52,6 +52,14 @@ if command -v docker &>/dev/null; then
   jaegertracing/all-in-one:1.60"
 fi
 
+plugins=(kubectl-mc kubectl-ctx kubectl-ns)
+for plugin in "${plugins[@]}"; do
+  if command -v "$plugin" &>/dev/null; then
+    name="${plugin#kubectl-}"
+    alias "$name"="$plugin"
+  fi
+done
+
 # GitHub CLI alias for Copilot
 if command -v gh &>/dev/null; then
   alias ghc='gh copilot'
