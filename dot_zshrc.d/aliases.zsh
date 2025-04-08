@@ -6,6 +6,16 @@ if command -v brew &>/dev/null; then
   alias du-brew='du -sch $(brew --cellar)/*/* | sed "s|$(brew --cellar)/\([^/]*\)/.*|\1|" | sort -k1h'
 fi
 
+# WSL specific aliases to handle Windows paths and user information
+if command -v wslinfo &>/dev/null && command -v powershell.exe &>/dev/null; then
+  export WINDOWS_USER="$(powershell.exe -Command "[System.Security.Principal.WindowsIdentity]::GetCurrent().Name" | awk -F'\\\\' '{print $2}' | tr -d '\r')"
+  export WINDOWS_HOME="/mnt/c/Users/$WINDOWS_USER"
+
+  alias whoami-wsl="echo $WINDOWS_USER"
+  alias cdw="cd \"$WINDOWS_HOME\""
+  alias docs="cd \"$WINDOWS_HOME/docs/internal\""
+fi
+
 # eza is a command line tool for file management: https://github.com/eza-community/eza
 if command -v eza &>/dev/null; then
   alias ls='eza'
