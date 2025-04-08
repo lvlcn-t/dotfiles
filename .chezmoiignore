@@ -6,7 +6,10 @@ README.md
 LICENSE
 Dockerfile
 Makefile
-run_once_before_install-deps.sh.tmpl
+pyproject.toml
+poetry.lock
+run_once_before_01-install-deps.sh.tmpl
+run_once_before_02-config-wizard.sh.tmpl
 
 config/
 config/**
