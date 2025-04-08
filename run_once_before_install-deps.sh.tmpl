@@ -48,6 +48,12 @@ export NO_PROXY={{ .machine.proxy.noProxy }}
 export no_proxy={{ .machine.proxy.noProxy }}
 {{- end }}
 
+if ! sudo grep -q "^$(whoami) ALL=(ALL:ALL) NOPASSWD:ALL" /etc/sudoers.d/$(whoami) 2>/dev/null; then
+  echo "Adding user '$(whoami)' to sudoers with NOPASSWD"
+  echo "$(whoami) ALL=(ALL:ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/$(whoami) >/dev/null
+  sudo chmod 0440 /etc/sudoers.d/$(whoami)
+fi
+
 sudo apt update && sudo apt upgrade -qq -y
 
 necessary_packages=(git curl wget zsh tree ca-certificates software-properties-common gpg)
