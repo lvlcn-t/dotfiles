@@ -1,7 +1,8 @@
 {
     "files.associations": {
         "dot_zshrc.tmpl": "shellscript",
-        "*.sh.tmpl": "shellscript"
+        "*.sh.tmpl": "shellscript",
+        "*.zsh.tmpl": "shellscript"
     },
     "[shellscript]": {
         "editor.indentSize": 2,
