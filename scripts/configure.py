@@ -89,17 +89,17 @@ def ask_yes_no(prompt: str) -> bool | None:
         False if no,
         None if skip.
     """
-    answer = input(f"{prompt} (y/n/skip): ").strip().lower()
-    match answer:
-        case "y" | "yes" | "ye" | "yeah" | "yep" | "bet" | "sure":
-            return True
-        case "n" | "no" | "nah" | "nope" | "never" | "not really":
-            return False
-        case "skip" | "s" | "sk" | "pass":
-            return None
-        case _:
-            print("❓ Please answer with 'y', 'n', or 'skip'.")
-            return ask_yes_no(prompt)
+    while True:
+        answer = input(f"{prompt} (y/n/skip): ").strip().lower()
+        match answer:
+            case "y" | "yes" | "ye" | "yeah" | "yep" | "bet" | "sure":
+                return True
+            case "n" | "no" | "nah" | "nope" | "never" | "not really":
+                return False
+            case "skip" | "s" | "sk" | "pass":
+                return None
+            case _:
+                print("❓ Please answer with 'y', 'n', or 'skip'.")
 
 
 def ask_value(prompt: str, default: str = "") -> str:
