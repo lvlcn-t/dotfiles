@@ -31,6 +31,11 @@ if command -v eza &>/dev/null; then
   alias tree='__auto_tree'
 fi
 
+# fastfetch is a fast and minimal system information tool: https://github.com/fastfetch-cli/fastfetch
+if command -v fastfetch &>/dev/null; then
+  alias neofetch='fastfetch'
+fi
+
 # Git-town aliases for streamlined git workflows
 if command -v git-town &>/dev/null; then
   alias gt="git town"
