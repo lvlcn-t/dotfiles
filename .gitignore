@@ -3,3 +3,4 @@ chezmoi.toml
 .chezmoidata.yaml
 scripts/install-deps.sh
 Brewfile.lock.json
+.venv

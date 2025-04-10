@@ -11,6 +11,8 @@ poetry.lock
 run_once_before_01-install-deps.sh.tmpl
 run_once_before_02-config-wizard.sh.tmpl
 
+.venv/
+.venv/**
 config/
 config/**
 scripts/
