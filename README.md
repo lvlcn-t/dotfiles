@@ -21,7 +21,7 @@ Feel free to explore and adapt these configurations to suit your own development
 
 **Warning:** This installation process will **overwrite** any existing configuration files. Make sure to back up your current dotfiles before proceeding.
 
-To directly install my dotfiles, simply run the following command in your terminal:
+To install my dotfiles, simply run the following command in your terminal:
 
 ```bash
 sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply lvlcn-t
@@ -29,34 +29,15 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply lvlcn-t
 
 This command will install [chezmoi](https://chezmoi.io/) and apply my dotfiles to your system. Chezmoi is a tool for managing dotfiles across multiple machines, providing a simple and secure way to handle your configuration files. For more information, check out the [official documentation](https://www.chezmoi.io/docs/).
 
-### Customize Before Applying 🛠️
+My dotfiles will bootstrap your system with the following:
+- Passwordless `sudo` access for `$USER`.
+- `zsh` as the default shell.
+- Install all dependencies listed in the [`Brewfile`](Brewfile) using [Homebrew](https://brew.sh/).
+- Configure Zsh with custom aliases and environment variables from [`dot_zshrc.d/`](./dot_zshrc.d/).
+- Apply the Powerlevel10k theme configuration from [`dot_p10k.zsh`](dot_p10k.zsh).
+- Set up Git with global settings from [`dot_gitconfig`](dot_gitconfig) and context-specific configurations from [`dot_gitconfig-personal`](dot_gitconfig-personal) and [`dot_gitconfig-work`](dot_gitconfig-work).
+- Store and manage credentials for remote servers using [`dot_netrc`](dot_netrc.tmpl).
+- Customize wget options with [`dot_wgetrc`](dot_wgetrc.tmpl).
+- Configure npm settings with [`dot_npmrc`](dot_npmrc.tmpl).
 
-If you prefer to adjust the [configurations](./.chezmoidata.yaml) before applying them, follow these steps:
-
-1. **Install chezmoi:**
-
-    ```bash
-    sh -c "$(curl -fsLS get.chezmoi.io)" -- -b $HOME/.local/bin
-    export PATH=$HOME/.local/bin:$PATH
-    ```
-
-2. **Initialize chezmoi with my dotfiles repository:**
-
-    ```bash
-    chezmoi init lvlcn-t
-    ```
-
-3. **Navigate to the chezmoi directory:**
-
-    ```bash
-    chezmoi cd
-    ```
-
-4. **Start the customization and application process:**
-
-    ```bash
-    sudo apt install build-essential -y
-    make install
-    ```
-
-That's it! Your dotfiles are now installed and ready to use. Enjoy your new development environment! 🎉
+Feel free to adapt these steps to your specific needs!
