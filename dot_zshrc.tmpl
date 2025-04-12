@@ -5,6 +5,10 @@ sourceIfExists() {
   test -f "$1" && source "$1"
 }
 
+if [ ! -z "$PROFILING" ]; then
+  zmodload zsh/zprof
+fi
+
 {{- if .machine.proxy.enabled }}
 # These must be set before any other commands that use the proxy.
 export HTTP_PROXY={{ .machine.proxy.http }}
@@ -22,3 +26,7 @@ sourceIfExists "$HOME/.zshrc.d/plugins.zsh"
 sourceIfExists "$HOME/.zshrc.d/keybindings.zsh"
 sourceIfExists "$HOME/.zshrc.d/aliases.zsh"
 sourceIfExists "$HOME/.zshrc.d/env.zsh"
+
+if [ ! -z "$PROFILING" ]; then
+  zprof
+fi
