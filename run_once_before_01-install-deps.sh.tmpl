@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# (c) 2025 lvlcn-t - pre-install-deps
+# (c) 2025 lvlcn-t - install-deps
 # This script is consumed by chezmoi to install dependencies once before running the dotfiles.
 # It is idempotent and can be run multiple times without causing issues.
 
@@ -26,6 +26,16 @@ add_repo() {
     sudo apt update
   else
     echo "Repository $repo already exists."
+  fi
+}
+
+# install_kubectl_plugin installs a kubectl plugin using krew
+# It checks if the plugin is already installed before attempting to install it.
+install_kubectl_plugin() {
+  local plugin=$1
+  if ! kubectl krew list | grep -q "$plugin"; then
+    echo "Installing krew plugin: $plugin"
+    kubectl krew install "$plugin"
   fi
 }
 
@@ -60,6 +70,11 @@ necessary_packages=(git curl wget zsh tree ca-certificates software-properties-c
 for package in "${necessary_packages[@]}"; do
   install_or_update "$package"
 done
+
+if [ "$SHELL" != "$(command -v zsh)" ]; then
+  echo "Setting zsh as the default shell"
+  sudo chsh -s "$(command -v zsh)" "$(whoami)"
+fi
 
 if ! command -v brew &>/dev/null; then
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -97,7 +112,9 @@ if ! command -v docker &>/dev/null; then
 fi
 
 if command -v kubectl-krew &>/dev/null; then
-  kubectl krew install ctx
-  kubectl krew install ns
-  kubectl krew install mc
+  install_kubectl_plugin "ctx"
+  install_kubectl_plugin "ns"
+  install_kubectl_plugin "mc"
 fi
+
+unset -f keyring_installed install_or_update add_repo install_kubectl_plugin
