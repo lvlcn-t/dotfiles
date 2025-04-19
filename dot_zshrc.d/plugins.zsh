@@ -32,34 +32,34 @@ zplug "plugins/brew", from:oh-my-zsh
 zplug "plugins/autojump", from:oh-my-zsh
 zplug "plugins/command-not-found", from:oh-my-zsh
 zplug "plugins/git", from:oh-my-zsh
-zplug "plugins/jsontools", from:oh-my-zsh
-zplug "reegnz/jq-zsh-plugin"
-zplug "plugins/vscode", from:oh-my-zsh
+zplug "plugins/jsontools", from:oh-my-zsh, defer:1
+zplug "reegnz/jq-zsh-plugin", defer:1
+zplug "plugins/vscode", from:oh-my-zsh, defer:1
 
-zplug "plugins/pyenv", from:oh-my-zsh
-zplug "plugins/nvm", from:oh-my-zsh
+zplug "plugins/pyenv", from:oh-my-zsh, defer:1
+zplug "plugins/nvm", from:oh-my-zsh, defer:1
 
-zplug "plugins/docker", from:oh-my-zsh
-zplug "plugins/docker-compose", from:oh-my-zsh
+zplug "plugins/docker", from:oh-my-zsh, defer:1
+zplug "plugins/docker-compose", from:oh-my-zsh, defer:1
 
 zplug "plugins/kubectl", from:oh-my-zsh
-zplug "plugins/helm", from:oh-my-zsh
-zplug "plugins/kind", from:oh-my-zsh
 zplug "plugins/argocd", from:oh-my-zsh
+zplug "plugins/helm", from:oh-my-zsh, defer:1
+zplug "plugins/kind", from:oh-my-zsh, defer:1
 
-zplug "plugins/aws", from:oh-my-zsh
-zplug "plugins/azure", from:oh-my-zsh
-zplug "plugins/gcloud", from:oh-my-zsh
+zplug "plugins/aws", from:oh-my-zsh, defer:1
+zplug "plugins/azure", from:oh-my-zsh, defer:1
+zplug "plugins/gcloud", from:oh-my-zsh, defer:1
 
-zplug "plugins/gh", from:oh-my-zsh
-zplug "plugins/chezmoi", from:oh-my-zsh
+zplug "plugins/gh", from:oh-my-zsh, defer:1
+zplug "plugins/chezmoi", from:oh-my-zsh, defer:1
 
-zplug "marlonrichert/zsh-autocomplete", depth:1
-zplug "zsh-users/zsh-autosuggestions", defer:2
-zplug "zsh-users/zsh-syntax-highlighting", defer:2
-zplug "zsh-users/zsh-completions", defer:2
+zplug "marlonrichert/zsh-autocomplete", depth:2
+zplug "zsh-users/zsh-autosuggestions", defer:3
+zplug "zsh-users/zsh-syntax-highlighting", defer:3
+zplug "zsh-users/zsh-completions", defer:3
 # Note: zsh-history-substring-search must be loaded after zsh-syntax-highlighting
-zplug "zsh-users/zsh-history-substring-search", defer:3
+zplug "zsh-users/zsh-history-substring-search", defer:4
 
 # Check for missing plugins and prompt installation if needed
 if ! zplug check --verbose; then

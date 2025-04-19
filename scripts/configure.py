@@ -49,7 +49,7 @@ class PrettyConfigSection:
             "enabled": "✅ " if self.section.get(key) else "❌ ",
             "http": "📡 ",
             "https": "🔒 ",
-            "noProxy": "🚫 ",
+            "no_proxy": "🚫 ",
             "machines": "🖥️ ",
             "proxy": "🌐 ",
         }.get(key, "📄 ")
@@ -132,7 +132,7 @@ def configure_netrc(config: dict[str, Any]) -> dict[str, Any]:
         print("🔐 Current netrc configuration found:")
         print(PrettyConfigSection(netrc_existing))
 
-    answer: bool | None = ask_yes_no("🧾 Do you want to configure netrc machines?")
+    answer: bool | None = ask_yes_no("🔐 Do you want to (re)configure the netrc settings?")
     if answer is None:
         print("⏭️ Skipping netrc configuration, preserving current values.")
         return config
@@ -169,7 +169,7 @@ def configure_proxy(config: dict[str, Any]) -> dict[str, Any]:
         print("🌐 Current proxy configuration found:")
         print(PrettyConfigSection(proxy_existing))
 
-    answer = ask_yes_no("🕸️ Enable proxy?")
+    answer = ask_yes_no("🕸️ Do you want to (re)configure the proxy settings?")
     if answer is None:
         print("⏭️ Skipping proxy configuration, preserving current values.")
         return config
@@ -178,7 +178,7 @@ def configure_proxy(config: dict[str, Any]) -> dict[str, Any]:
         enabled = True
         http = ask_value("📡 HTTP Proxy", default=proxy_existing.get("http", ""))
         https = ask_value("🔒 HTTPS Proxy", default=proxy_existing.get("https", ""))
-        no_proxy = ask_value("🚫 No Proxy", default=proxy_existing.get("noProxy", ""))
+        no_proxy = ask_value("🚫 No Proxy", default=proxy_existing.get("no_proxy", ""))
     else:
         enabled = False
         http = "http://proxy.example.com:8080"
@@ -189,7 +189,48 @@ def configure_proxy(config: dict[str, Any]) -> dict[str, Any]:
         "enabled": enabled,
         "http": http,
         "https": https,
-        "noProxy": no_proxy,
+        "no_proxy": no_proxy,
+    }
+    return config
+
+
+def configure_conjur(config: dict[str, Any]) -> dict[str, Any]:
+    """
+    Update (or preserve) the conjur configuration section.
+
+    Args:
+        config: The current configuration dictionary.
+
+    Returns:
+        The updated configuration dictionary.
+    """
+    conjur_existing = config.get("data", {}).get("machine", {}).get("conjur", {})
+    if conjur_existing:
+        print("🔑 Current conjur configuration found:")
+        print(PrettyConfigSection(conjur_existing))
+
+    answer = ask_yes_no("🔑 Do you want to (re)configure the Conjur instance?")
+    if answer is None:
+        print("⏭️ Skipping Conjur configuration, preserving current values.")
+        return config
+
+    url = ask_value("🌐 Conjur URL", default=conjur_existing.get("url", ""))
+    account = ask_value("🏢 Conjur Account", default=conjur_existing.get("account", ""))
+    sns = ask_value(
+        "🔑 Conjur Secret Namespace",
+        default=conjur_existing.get("secret_namespace", ""),
+    )
+    login_host = ask_value(
+        "🏠 Conjur Login Host", default=conjur_existing.get("login_host", "")
+    )
+    api_key = ask_value("🔑 Conjur API Key", default=conjur_existing.get("api_key", ""))
+
+    config.setdefault("data", {}).setdefault("machine", {})["conjur"] = {
+        "url": url,
+        "account": account,
+        "sns": sns,
+        "login_host": login_host,
+        "api_key": api_key,
     }
     return config
 
@@ -211,6 +252,7 @@ def main() -> None:
     config = load_config()
     config = configure_netrc(config)
     config = configure_proxy(config)
+    config = configure_conjur(config)
     save_config(config)
     print("🎉 Done! Have a great day ✨")
 

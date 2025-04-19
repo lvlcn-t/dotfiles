@@ -13,10 +13,10 @@ fi
 # These must be set before any other commands that use the proxy.
 export HTTP_PROXY={{ .machine.proxy.http }}
 export HTTPS_PROXY={{ .machine.proxy.https }}
-export NO_PROXY={{ .machine.proxy.noProxy }}
+export NO_PROXY={{ .machine.proxy.no_proxy }}
 export http_proxy={{ .machine.proxy.http }}
 export https_proxy={{ .machine.proxy.https }}
-export no_proxy={{ .machine.proxy.noProxy }}
+export no_proxy={{ .machine.proxy.no_proxy }}
 {{- end }}
 
 # Brew is a package manager for macOS and Linux: https://brew.sh/

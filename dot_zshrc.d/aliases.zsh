@@ -67,6 +67,7 @@ if command -v docker &>/dev/null; then
   jaegertracing/all-in-one:1.60"
 fi
 
+# Set up aliases for kubectl plugins
 plugins=(kubectl-ctx kubectl-ns)
 for plugin in "${plugins[@]}"; do
   if command -v "$plugin" &>/dev/null; then
@@ -74,6 +75,81 @@ for plugin in "${plugins[@]}"; do
     alias "$name"="$plugin"
   fi
 done
+
+if command -v argocd &>/dev/null; then
+  # Log in to ArgoCD using the provided context.
+  # Args:
+  #   context: The kubectl context to use. Must be provided.
+  # Returns:
+  #   0 if successful, 1 if the context is not provided or the port-forwarding fails.
+  argocd-login() {
+    local ctx="$1"
+    local ns="argocd"
+    local svc="argo-cd-upstream-argocd-server"
+    local port_file="/tmp/argocd-port-$ctx"
+    local port password
+
+    if [[ "$ctx" =~ ^(-h|--help)$ ]]; then
+      cat <<EOF
+Usage: argocd-login <context>
+Logs into ArgoCD in the given context, auto-port-forwarding
+to a private port per context.
+
+Args:
+  context: The kubectl context to use. Must be provided.
+Returns:
+  0 if successful, 1 if the context is not provided or the port-forwarding fails.
+EOF
+      return 0
+    fi
+
+    if [[ -z "$ctx" ]]; then
+      echo "Error: no context provided."
+      return 1
+    fi
+
+    [[ -f "$port_file" ]] && port=$(<"$port_file")
+
+    if [[ -z "$port" ]] || ! bash -c ">/dev/tcp/localhost/$port" &>/dev/null; then
+      for p in {10240..11240}; do
+        if ! bash -c ">/dev/tcp/localhost/$p" &>/dev/null; then
+          port=$p
+          break
+        fi
+      done
+
+      if [[ -z "$port" ]]; then
+        echo "Error: no free port found."
+        return 1
+      fi
+
+      echo "$port" >"$port_file"
+      echo "→ Port-forwarding $svc in '$ctx' to localhost:$port…"
+      kubectl --context "$ctx" -n "$ns" port-forward svc/"$svc" "$port":443 &>/dev/null &
+      sleep 1
+    else
+      echo "→ Reusing existing localhost:$port for context '$ctx'."
+    fi
+
+    password=$(kubectl get secret argocd-initial-admin-secret \
+      --context "$ctx" -n "$ns" \
+      -o jsonpath="{.data.password}" | base64 -d)
+
+    argocd login "localhost:$port" \
+      --username admin \
+      --password "$password" \
+      --plaintext
+  }
+
+  # Autocomplete for argocd-login
+  __argocd_contexts() {
+    local contexts
+    IFS=$'\n' contexts=($(kubectl config get-contexts -o=name 2>/dev/null))
+    compadd -- "${contexts[@]}"
+  }
+
+  compdef __argocd_contexts argocd-login
+fi
 
 # GitHub CLI alias for Copilot
 if command -v gh &>/dev/null; then
@@ -95,4 +171,54 @@ fi
 # yt-dlp alias for extracting mp3 from videos
 if command -v yt-dlp &>/dev/null; then
   alias yt-mp3='yt-dlp -x --audio-format mp3'
+fi
+
+# Log in to Conjur using the provided host and token.
+# Args:
+#   host: The host to log in to. If not provided, it defaults to the value of $CONJUR_AUTHN_LOGIN_HOST.
+#   token: The token to use for authentication. If not provided, the token will be read from stdin.
+# Returns:
+#   0 if successful, 1 if the host is not provided or the token is not valid.
+# Exports:
+#   CONJUR_AUTHN_LOGIN_HOST: The Conjur host URL.
+#   CONJUR_AUTHN_API_KEY: The Conjur API key.
+__conjur_login() {
+  local host=${1:-$CONJUR_AUTHN_LOGIN_HOST}
+  local token=$2
+
+  if [[ "$1" == "--help" || "$1" == "-h" || -z "$host" ]]; then
+    cat <<EOF
+
+Usage: conjur_login [host] [token]
+
+Logs into conjur using the provided host and token.
+
+Args:
+  host: The host to login to. If not provided, it defaults to '$CONJUR_AUTHN_LOGIN_HOST'.
+  token: The token to use for authentication. If not provided, the token will be read from stdin.
+
+EOF
+    return 0
+  fi
+
+  if [ -z "$token" ]; then
+    echo -n "Enter Conjur authentication token: "
+    read -s token
+    echo
+  fi
+
+  if [[ "$host" == "$CONJUR_SNS"* ]]; then
+    host="${host#$CONJUR_SNS/}"
+  fi
+
+  unset -v CONJUR_AUTHN_LOGIN_HOST CONJUR_AUTHN_API_KEY
+  export CONJUR_AUTHN_LOGIN_HOST="$CONJUR_SNS/$host"
+  export CONJUR_AUTHN_API_KEY="$token"
+  rm "$CONJUR_AUTHN_TOKEN_FILE" || true
+  echo "Logged into Conjur host '$host'"
+}
+
+# Aliases for the conjur-utils CLI
+if [[ -d "$HOME/.local/share/conjur-utils" ]]; then
+  alias conjur-login="__conjur_login"
 fi

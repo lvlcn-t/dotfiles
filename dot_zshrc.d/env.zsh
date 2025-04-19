@@ -55,7 +55,8 @@ function __set_github_env() {
     # TODO: Investigate why gh auth login fails when we set $GH_HOST here
     # export GH_HOST="https://$host"
     export GH_USER="$user"
-    export GH_TOKEN="$token"
+    # TODO: Investigate why gh copliot isn't usable with $GH_TOKEN set
+    # export GH_TOKEN="$token"
   else
     echo 'No .netrc file found at $(realpath "$netrc"). Please create one with your GitHub credentials.'
     return 1
@@ -180,6 +181,18 @@ fi
 # Disable telemetry for the Azure Functions Core Tools
 if command -v func &>/dev/null; then
   export FUNCTIONS_CORE_TOOLS_TELEMETRY_OPTOUT="true"
+fi
+
+# Configure the conjur-utils CLI if installed
+if [[ -d "$HOME/.local/share/conjur-utils" ]]; then
+  export CONJUR_APPLIANCE_URL="{{ .machine.conjur.url }}"
+  export CONJUR_ACCOUNT="{{ .machine.conjur.account }}"
+  export CONJUR_SNS="{{ .machine.conjur.sns }}"
+  export CONJUR_AUTHN_LOGIN_HOST="{{ .machine.conjur.login_host }}"
+  export CONJUR_AUTHN_API_KEY="{{ .machine.conjur.api_key }}"
+
+  export CONJUR_CERT_FILE="$HOME/.local/share/conjur-utils/conjur-cert.pem"
+  export CONJUR_AUTHN_TOKEN_FILE="$HOME/.local/share/conjur-utils/.conjur-access-token"
 fi
 
 # Unset all internal functions to unpollute the environment.

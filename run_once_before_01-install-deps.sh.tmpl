@@ -54,8 +54,8 @@ export HTTP_PROXY={{ .machine.proxy.http }}
 export HTTPS_PROXY={{ .machine.proxy.https }}
 export http_proxy={{ .machine.proxy.http }}
 export https_proxy={{ .machine.proxy.https }}
-export NO_PROXY={{ .machine.proxy.noProxy }}
-export no_proxy={{ .machine.proxy.noProxy }}
+export NO_PROXY={{ .machine.proxy.no_proxy }}
+export no_proxy={{ .machine.proxy.no_proxy }}
 {{- end }}
 
 if ! sudo grep -q "^$(whoami) ALL=(ALL:ALL) NOPASSWD:ALL" /etc/sudoers.d/$(whoami) 2>/dev/null; then
