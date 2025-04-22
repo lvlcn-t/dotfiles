@@ -55,11 +55,11 @@ zplug "plugins/gh", from:oh-my-zsh, defer:1
 zplug "plugins/chezmoi", from:oh-my-zsh, defer:1
 
 zplug "marlonrichert/zsh-autocomplete", depth:2
-zplug "zsh-users/zsh-autosuggestions", defer:3
-zplug "zsh-users/zsh-syntax-highlighting", defer:3
-zplug "zsh-users/zsh-completions", defer:3
+zplug "zsh-users/zsh-autosuggestions", defer:2
+zplug "zsh-users/zsh-syntax-highlighting", defer:2
+zplug "zsh-users/zsh-completions", defer:2
 # Note: zsh-history-substring-search must be loaded after zsh-syntax-highlighting
-zplug "zsh-users/zsh-history-substring-search", defer:4
+zplug "zsh-users/zsh-history-substring-search", defer:3
 
 # Check for missing plugins and prompt installation if needed
 if ! zplug check --verbose; then
