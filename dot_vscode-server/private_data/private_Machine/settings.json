@@ -1,0 +1,7 @@
+{
+    "terminal.integrated.env.linux": {
+        "GOROOT": "/home/linuxbrew/.linuxbrew/opt/go/libexec",
+        "PATH": "/home/linuxbrew/.linuxbrew/opt/go/libexec/bin:${env:PATH}"
+    },
+    "go.goroot": "/home/linuxbrew/.linuxbrew/opt/go/libexec"
+}
