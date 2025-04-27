@@ -36,6 +36,10 @@ if command -v fastfetch &>/dev/null; then
   alias neofetch='fastfetch'
 fi
 
+if command -v git &>/dev/null; then
+  alias gcs="git commit --signoff"
+fi
+
 # Git-town aliases for streamlined git workflows
 if command -v git-town &>/dev/null; then
   alias gt="git town"
