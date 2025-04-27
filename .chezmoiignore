@@ -8,8 +8,11 @@ Dockerfile
 Makefile
 pyproject.toml
 poetry.lock
+poetry.toml
+run_once_before_00-setup.sh.tmpl
 run_once_before_01-install-deps.sh.tmpl
-run_once_before_02-config-wizard.sh.tmpl
+run_once_before_02-cleanup.sh.tmpl
+run_once_before_03-config-wizard.sh.tmpl
 
 .venv/
 .venv/**
