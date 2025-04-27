@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# (c) 2025 lvlcn-t - setup
+# This script sets up the initial configuration for chezmoi so that it can be run
+# without any user interaction beforehand.
+
+if [ ! -f {{ .chezmoi.configFile }} ]; then
+  cp {{ .chezmoi.sourceDir }}/config/chezmoi.toml {{ .chezmoi.configFile }}
+fi

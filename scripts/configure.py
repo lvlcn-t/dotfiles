@@ -132,7 +132,9 @@ def configure_netrc(config: dict[str, Any]) -> dict[str, Any]:
         print("🔐 Current netrc configuration found:")
         print(PrettyConfigSection(netrc_existing))
 
-    answer: bool | None = ask_yes_no("🔐 Do you want to (re)configure the netrc settings?")
+    answer: bool | None = ask_yes_no(
+        "🔐 Do you want to (re)configure the netrc settings?"
+    )
     if answer is None:
         print("⏭️ Skipping netrc configuration, preserving current values.")
         return config
@@ -214,16 +216,27 @@ def configure_conjur(config: dict[str, Any]) -> dict[str, Any]:
         print("⏭️ Skipping Conjur configuration, preserving current values.")
         return config
 
-    url = ask_value("🌐 Conjur URL", default=conjur_existing.get("url", ""))
-    account = ask_value("🏢 Conjur Account", default=conjur_existing.get("account", ""))
-    sns = ask_value(
-        "🔑 Conjur Secret Namespace",
-        default=conjur_existing.get("secret_namespace", ""),
-    )
-    login_host = ask_value(
-        "🏠 Conjur Login Host", default=conjur_existing.get("login_host", "")
-    )
-    api_key = ask_value("🔑 Conjur API Key", default=conjur_existing.get("api_key", ""))
+    if answer:
+        url = ask_value("🌐 Conjur URL", default=conjur_existing.get("url", ""))
+        account = ask_value(
+            "🏢 Conjur Account", default=conjur_existing.get("account", "")
+        )
+        sns = ask_value(
+            "🔑 Conjur Secret Namespace",
+            default=conjur_existing.get("secret_namespace", ""),
+        )
+        login_host = ask_value(
+            "🏠 Conjur Login Host", default=conjur_existing.get("login_host", "")
+        )
+        api_key = ask_value(
+            "🔑 Conjur API Key", default=conjur_existing.get("api_key", "")
+        )
+    else:
+        url = "https://conjur.example.com"
+        account = "my-account"
+        sns = "example/secret/namespace"
+        login_host = "$CONJUR_SNS/my-host"
+        api_key = "my-api-key"
 
     config.setdefault("data", {}).setdefault("machine", {})["conjur"] = {
         "url": url,

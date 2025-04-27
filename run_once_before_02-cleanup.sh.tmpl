@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# (c) 2025 lvlcn-t - setup
+# This script cleans up the system before running the configuration wizard.
+# This is necessary to ensure the default configuration is removed and the
+# user can start with a clean slate.
+
+if [ ! -f {{ .chezmoi.configFile }} ]; then
+  exit 0
+fi
+
+difference=$(diff {{ .chezmoi.sourceDir }}/config/chezmoi.toml {{ .chezmoi.configFile }})
+if [ -z "$difference" ]; then
+  rm {{ .chezmoi.configFile }}
+  exit 0
+fi
