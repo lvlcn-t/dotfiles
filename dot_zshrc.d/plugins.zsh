@@ -89,7 +89,7 @@ fi
 # GitHub Copilot CLI (gh-copilot) completion
 if ! gh extension list 2>&1 | grep -q "gh-copilot"; then
   echo "Installing GitHub Copilot CLI extension..."
-  gh extension install github/copilot-cli
+  gh extension install github/gh-copilot --force
   eval "$(gh copilot alias -- zsh)"
 else
   eval "$(gh copilot alias -- zsh)"
