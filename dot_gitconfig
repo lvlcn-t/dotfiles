@@ -26,6 +26,9 @@
 [commit]
 	gpgsign = true
 
+[format]
+        signoff = true
+
 [diff]
     tool = nvimdiff
 
