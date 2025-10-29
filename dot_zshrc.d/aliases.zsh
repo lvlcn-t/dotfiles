@@ -226,3 +226,9 @@ EOF
 if [[ -d "$HOME/.local/share/conjur-utils" ]]; then
   alias conjur-login="__conjur_login"
 fi
+
+# Flox config
+if [[ -d "$HOME/.local/share/flox" ]]; then
+  alias flo='flox activate -d $HOME/.local/share/flox'
+fi
+

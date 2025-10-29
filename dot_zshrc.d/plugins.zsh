@@ -100,30 +100,3 @@ if command -v azd &>/dev/null; then
   source <(azd completion zsh)
 fi
 
-# Install Python using pyenv if not already installed.
-# Args:
-#   python_version: The version of Python to install.
-# Returns:
-#   0 if successful, 1 if pyenv is not found or the installation fails.
-function __install_python() {
-  local python_version="$1"
-  if python3 --version | grep -q "$python_version" &>/dev/null; then
-    return 0
-  fi
-
-  if ! command -v pyenv &>/dev/null; then
-    echo "pyenv not found. Please install pyenv to install Python $python_version."
-    return 1
-  fi
-
-  if ! pyenv versions --bare | grep -q "$python_version" &>/dev/null; then
-    pyenv install -v "$python_version" || return 1
-  fi
-
-  pyenv global "$python_version" || return 1
-}
-
-__install_python "3.13" || {
-  echo "Failed to install the latest Python version. Please check your pyenv installation."
-}
-unset -f __install_python
