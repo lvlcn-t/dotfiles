@@ -1,0 +1,140 @@
+if status is-interactive
+    # Commands to run in interactive sessions can go here
+end
+
+{{- if .machine.proxy.enabled }}
+# Proxy configuration - must be set before other commands
+set -gx HTTP_PROXY {{ .machine.proxy.http }}
+set -gx HTTPS_PROXY {{ .machine.proxy.https }}
+set -gx NO_PROXY {{ .machine.proxy.no_proxy }}
+set -gx http_proxy {{ .machine.proxy.http }}
+set -gx https_proxy {{ .machine.proxy.https }}
+set -gx no_proxy {{ .machine.proxy.no_proxy }}
+{{- end }}
+
+# Homebrew - package manager setup
+eval (/home/linuxbrew/.linuxbrew/bin/brew shellenv)
+
+starship init fish | source
+
+bind tab complete-and-search
+bind ctrl-j forward-char
+bind ctrl-h backward-kill-path-component
+
+# Locale
+set -gx LANG C.UTF-8
+
+# Editor
+set -gx EDITOR nvim
+
+# History
+set -g fish_history_max_items 10000
+
+# Essential PATH additions
+fish_add_path $HOME/bin
+fish_add_path $HOME/.cargo/bin
+fish_add_path $HOME/.local/bin
+fish_add_path $HOME/.local/go/bin
+fish_add_path $HOME/.local/nvim/bin
+fish_add_path $HOME/.krew/bin
+fish_add_path $HOME/go/bin
+
+# PNPM
+set -gx PNPM_HOME $HOME/.local/share/pnpm
+fish_add_path $PNPM_HOME
+
+# Go configuration
+if command -v go &>/dev/null
+    set -gx GOBIN $HOME/.local/bin
+    set -gx GOPRIVATE gitlab.devops.telekom.de
+    set -gx GO111MODULE on
+end
+
+# GitLab CI local
+if command -v gitlab-ci-local &>/dev/null
+    set -gx GCL_NEEDS true
+end
+
+# Azure Developer CLI - disable telemetry
+if command -v azd &>/dev/null
+    set -gx AZURE_DEV_COLLECT_TELEMETRY no
+end
+
+# Azure Functions Core Tools - disable telemetry
+if command -v func &>/dev/null
+    set -gx FUNCTIONS_CORE_TOOLS_TELEMETRY_OPTOUT true
+end
+
+# Conjur configuration (if installed)
+if test -d $HOME/.local/share/conjur-utils
+    set -gx CONJUR_APPLIANCE_URL "{{ .machine.conjur.url }}"
+    set -gx CONJUR_ACCOUNT "{{ .machine.conjur.account }}"
+    set -gx CONJUR_SNS "{{ .machine.conjur.sns }}"
+    set -gx CONJUR_AUTHN_LOGIN_HOST "{{ .machine.conjur.login_host }}"
+    set -gx CONJUR_AUTHN_API_KEY "{{ .machine.conjur.api_key }}"
+    set -gx CONJUR_CERT_FILE $HOME/.local/share/conjur-utils/conjur-cert.pem
+    set -gx CONJUR_AUTHN_TOKEN_FILE $HOME/.local/share/conjur-utils/.conjur-access-token
+end
+
+# Load cargo env if it exists
+if test -f $HOME/.cargo/env
+    bass source $HOME/.cargo/env
+end
+
+# Load Claude vars if they exist
+if test -f $HOME/.claudevars
+    bass source $HOME/.claudevars
+end
+
+abbr --add gcs "git commit --signoff"
+abbr --add gcsm "git commit --signoff -m"
+
+# Git-town aliases
+if command -v git-town &>/dev/null
+    alias gt="git town"
+    alias gts="git town sync"
+    alias gtb="git town branch"
+    alias gtsw="git town switch"
+end
+
+# Kubectl krew plugins
+if command -v kubectl-ctx &>/dev/null
+    alias ctx="kubectl-ctx"
+end
+if command -v kubectl-ns &>/dev/null
+    alias ns="kubectl-ns"
+end
+
+# GitHub Copilot
+if command -v gh &>/dev/null
+    alias ghc="gh copilot"
+end
+
+# GitLab aliases
+if command -v glab &>/dev/null
+    alias gpsci="git push -o ci.skip"
+end
+
+if command -v gitlab-ci-local &>/dev/null
+    alias gci="gitlab-ci-local"
+end
+
+# Enhanced ls with eza
+if command -v eza &>/dev/null
+    alias ls="eza"
+    alias ll="eza -lah --icons"
+end
+
+# fastfetch alias
+if command -v fastfetch &>/dev/null
+    alias neofetch="fastfetch"
+end
+
+# Flox environment
+if test -d $HOME/.local/share/flox
+    alias flo="flox activate -d $HOME/.local/share/flox"
+end
+
+# Theme configuration
+fish_config theme choose "One Dark"
+set fish_color_error red --bold
