@@ -9,8 +9,11 @@ This document provides essential information for AI agents working in this dotfi
 **Technology Stack**:
 - **Dotfile Manager**: chezmoi (template-based dotfile management)
 - **Package Manager**: Homebrew (Linux)
-- **Shell**: Zsh with zplug plugin manager
-- **Prompt**: Starship (primary) or Powerlevel10k (fallback)
+- **Shells**: 
+  - Zsh (primary) with zplug plugin manager
+  - Fish shell (alternative, fully configured with fisher plugins)
+- **Prompt**: Starship (primary) or Powerlevel10k (fallback for Zsh)
+- **Terminal Multiplexer**: tmux (with custom key bindings)
 - **Python**: Poetry for dependency management (Python 3.14+)
 - **Testing**: pytest, ruff for linting
 - **Security**: pre-commit hooks with gitleaks for secret scanning
@@ -113,17 +116,31 @@ pre-commit run gitleaks --all-files
 ├── dot_config/                    # Maps to ~/.config/
 │   ├── starship.toml             # Starship prompt configuration
 │   └── private_fish/             # Fish shell config (prefix "private_" = read-only by owner)
+│       ├── config.fish.tmpl      # Main fish configuration (templated)
+│       ├── fish_plugins          # Fisher plugin list
+│       ├── functions/            # Fish shell functions (git helpers, fzf, z, etc.)
+│       ├── completions/          # Shell completions (fisher, fzf, nvm)
+│       └── conf.d/               # Autoloaded config files (async_prompt, fzf, git, nvm, tmux, z)
 ├── dot_zshrc.d/                  # Zsh configuration modules
-│   ├── aliases.zsh               # Command aliases and shell functions
+│   ├── aliases.zsh               # Command aliases and shell functions (234 lines)
 │   ├── env.zsh.tmpl              # Environment variables (templated)
 │   ├── keybindings.zsh           # Key bindings configuration
 │   └── plugins.zsh               # Zplug plugin declarations
+├── dot_tmux.conf                 # Tmux terminal multiplexer configuration
+├── dot_p10k.zsh                  # Powerlevel10k prompt theme config (fallback)
+├── dot_gitconfig*                # Git configurations (main, personal, work)
+├── dot_netrc.tmpl                # Network credentials (templated, private)
+├── dot_npmrc.tmpl                # NPM configuration (templated)
+├── dot_wgetrc.tmpl               # Wget configuration (templated)
 ├── run_once_before_*.sh.tmpl     # Bootstrap scripts (run once before apply)
 ├── scripts/                       # Helper scripts
 │   └── configure.py              # Interactive configuration wizard
 ├── config/                        # Configuration templates
 │   └── chezmoi.toml              # Default chezmoi config template
-└── Brewfile                       # Homebrew package definitions
+├── Brewfile                       # Homebrew package definitions (65 packages)
+├── Makefile                       # Main interface for common operations
+├── Dockerfile                     # Docker container for testing dotfiles
+└── .chezmoiexternal.toml         # External resources (nvim from GitHub)
 ```
 
 ### Naming Conventions
@@ -146,8 +163,23 @@ pre-commit run gitleaks --all-files
 - `~/.zshrc` (from `dot_zshrc.tmpl`) - Main entry point, sources modules
 - `~/.zshrc.d/plugins.zsh` - Plugin management (zplug, oh-my-zsh plugins)
 - `~/.zshrc.d/env.zsh.tmpl` - Environment setup, tool initialization
-- `~/.zshrc.d/aliases.zsh` - Aliases and shell functions
+- `~/.zshrc.d/aliases.zsh` - Aliases and shell functions (234 lines)
 - `~/.zshrc.d/keybindings.zsh` - Key bindings and shell options
+
+**Fish shell configuration**:
+- `~/.config/fish/config.fish` (from `dot_config/private_fish/config.fish.tmpl`) - Main fish config
+- Uses fisher for plugin management (plugins declared in `fish_plugins`)
+- `functions/` - Custom functions for git workflows, fzf, z directory jumping, nvm
+- `completions/` - Shell completions for fisher, fzf, nvm
+- `conf.d/` - Auto-loaded configuration files (async_prompt, fzf, git, nvm, tmux, z)
+
+**Tmux configuration**:
+- `~/.tmux.conf` (from `dot_tmux.conf`) - Terminal multiplexer settings
+- Prefix: `C-a` (instead of default `C-b`)
+- Split panes: `|` (horizontal), `-` (vertical)
+- Mouse support enabled
+- Vi mode keys
+- Alt-arrow keys for pane navigation without prefix
 
 **Python scripts**:
 - `scripts/configure.py` - Interactive wizard for netrc, proxy, and Conjur configuration
@@ -245,6 +277,9 @@ sourceIfExists "$HOME/.zshrc.d/plugins.zsh"
 - Use `tomllib` (built-in) for reading TOML, `toml` package for writing
 - Emoji prefixes for user-facing messages: 🚀 📦 ✅ ❌ ⚠️ 🔐 🌐 etc.
 - Interactive prompts with yes/no/skip options
+  - Yes answers: `y`, `yes`, `ye`, `yeah`, `yep`, `bet`, `sure`
+  - No answers: `n`, `no`, `nah`, `nope`, `never`, `not really`
+  - Skip answers: `skip`, `s`, `sk`, `pass`
 - Preserve existing configuration when skipped
 
 **Configuration wizard pattern**:
@@ -275,10 +310,17 @@ def configure_section(config: dict[str, Any]) -> dict[str, Any]:
 
 **Conditional includes** (context-aware configs):
 ```gitconfig
+# Supports both SSH and HTTPS URLs
 [includeIf "hasconfig:remote.*.url:git@github.com*/**"]
     path = .gitconfig-personal
 
+[includeIf "hasconfig:remote.*.url:https://github.com/**"]
+    path = .gitconfig-personal
+
 [includeIf "hasconfig:remote.*.url:git@gitlab.devops.telekom.de*/**"]
+    path = .gitconfig-work
+
+[includeIf "hasconfig:remote.*.url:https://gitlab.devops.telekom.de/**"]
     path = .gitconfig-work
 ```
 
@@ -302,10 +344,13 @@ def configure_section(config: dict[str, Any]) -> dict[str, Any]:
    - Handles proxy configuration (interactive or from config)
 
 3. **Configuration wizard** (`run_once_before_02-config-wizard.sh.tmpl`):
+   - Checks if config file differs from template
+   - If identical to template, removes config file to force re-run
    - Runs `poetry install` to set up Python environment
    - Executes `scripts/configure.py` for interactive setup
    - Configures netrc, proxy, and Conjur settings
    - Writes final config to `~/.config/chezmoi/chezmoi.toml`
+   - Allows skipping sections to preserve existing config
 
 ### Development Tools
 
@@ -368,9 +413,11 @@ export NO_PROXY={{ .machine.proxy.no_proxy }}
 - `neofetch` → `fastfetch` (faster system info)
 - `ghc` - `gh copilot` (GitHub Copilot CLI)
 - `dive` - Docker image explorer (via container)
-- `jaeger` - Start Jaeger tracing container
+- `jaeger` - Start Jaeger tracing container (all-in-one:1.60)
 - `conjur-login` - Log into Conjur instance
 - `flo` - Activate Flox environment
+- `yt-mp3` - Extract MP3 from videos using yt-dlp
+- `du-brew` - Show disk usage by Homebrew package (sorted by size)
 
 ### WSL-Specific Aliases
 ```bash
@@ -379,6 +426,53 @@ whoami-wsl      # Display Windows username
 cdw             # cd to Windows home directory
 docs            # cd to Windows documents
 ```
+
+## Shell-Specific Features
+
+### Fish Shell
+
+**Plugin management** (via fisher):
+- Plugins listed in `~/.config/fish/fish_plugins`
+- Auto-installed on first run if fisher is available
+- Key plugins: fzf, z (directory jumping), nvm, git helpers
+
+**Custom functions**:
+- Git workflow: `gwip`, `gunwip`, `gbage`, `gbda`, `grename`, `grt`, `gtest`
+- Fzf integration: `_fzf_search_directory`, `_fzf_search_git_log`, `_fzf_search_history`, `_fzf_search_processes`
+- Directory navigation: `z` (frecency-based cd)
+- Node version management: `nvm` functions
+
+**Configuration features**:
+- Async prompt for better performance
+- Tmux integration (auto-start/attach)
+- Git status in prompt
+- Custom theme: "One Dark"
+
+### Tmux Usage
+
+**Key Bindings**:
+- Prefix: `C-a` (Ctrl+A)
+- Split horizontal: `C-a |`
+- Split vertical: `C-a -`
+- Reload config: `C-a r`
+- Navigate panes: `Alt+Arrow` (no prefix needed)
+- Previous window: `C-a p`
+
+**Features**:
+- Mouse support enabled (clickable panes, resizable)
+- Vi mode keys for copy mode
+- Windows/panes start at index 1 (not 0)
+- New windows/panes open in current directory
+- 256 color support with truecolor
+
+### Starship Prompt
+
+**Configuration**: `~/.config/starship.toml`
+- Custom format with modules: OS, username, directory, git, languages, docker, time
+- Color palette: Gruvbox Dark
+- Language support: C, Rust, Go, Node.js, PHP, Java, Kotlin, Haskell, Python
+- Git integration: branch and status display
+- Docker context awareness
 
 ## Testing & CI
 
@@ -415,8 +509,13 @@ poetry run ruff format
 1. **Template syntax**: Use `{{-` to trim preceding whitespace, `-}}` for trailing
 2. **File permissions**: Use `private_` prefix for sensitive files (0600 permissions)
 3. **Run-once scripts**: Named `run_once_before_*.sh.tmpl` execute once, then chezmoi tracks state
-4. **External archives**: `.chezmoiexternal.toml` defines external resources (e.g., nvim config from GitHub)
-5. **Ignored files**: `.chezmoiignore` prevents certain files from being applied (e.g., scripts/, .venv/)
+4. **External resources**: `.chezmoiexternal.toml` defines external resources (e.g., nvim config from GitHub)
+5. **Ignored files**: `.chezmoiignore` prevents certain files from being applied
+   - Repository files: `README.md`, `LICENSE`, `Dockerfile`, `Makefile`, `pyproject.toml`, `poetry.lock`
+   - Config templates: `config/`, `chezmoi.toml`, `.chezmoidata.yaml`
+   - Scripts and development: `scripts/`, `.venv/`, `.vscode/`
+   - Bootstrap scripts: `run_once_before_*.sh.tmpl`
+   - Git/CI configs: `.gitignore`, `.pre-commit-config.yaml`
 
 ### Configuration
 
@@ -425,12 +524,18 @@ poetry run ruff format
    - Active config: `~/.config/chezmoi/chezmoi.toml`
    - Wizard compares and removes active if identical to template
 
-2. **Netrc parsing**: Custom shell function `__parse_netrc` extracts credentials
+2. **Chezmoi settings**:
+   - Auto-commit: enabled (`git.autoCommit = true`)
+   - Auto-push: disabled (`git.autoPush = false`)
+   - Editor: VSCode with `--wait` flag (`edit.command = "code"`)
+   - Commit message: interactive prompt
+
+3. **Netrc parsing**: Custom shell function `__parse_netrc` extracts credentials
    - Format: `machine <host> login <user> password <token>`
 
-3. **GitHub CLI auth**: `GH_TOKEN` env var is commented out in env.zsh (conflicts with copilot)
+4. **GitHub CLI auth**: `GH_TOKEN` env var is commented out in env.zsh (conflicts with copilot)
 
-4. **GitLab host**: Hardcoded to `gitlab.devops.telekom.de` in env.zsh.tmpl:107
+5. **GitLab host**: Hardcoded to `gitlab.devops.telekom.de` in env.zsh.tmpl:107
 
 ### Shell Configuration
 
@@ -455,9 +560,10 @@ poetry run ruff format
 
 ### External Dependencies
 
-1. **Neovim config**: Fetched from `https://github.com/lvlcn-t/kickstart.nvim` (refreshed every 220h)
+1. **Neovim config**: Fetched from `https://github.com/lvlcn-t/kickstart.nvim` as git-repo
 2. **Homebrew path**: Hardcoded to `/home/linuxbrew/.linuxbrew/bin/brew` (Linux installation)
 3. **Krew plugins**: Only install if `kubectl-krew` command exists
+4. **Fisher (Fish)**: Plugin manager for Fish shell, auto-installed if missing
 
 ## Working with This Repository
 
@@ -520,6 +626,14 @@ make debug
 # - chezmoi apply --verbose --force
 # - Drops into zsh shell for testing
 ```
+
+**Docker test environment**:
+- Base image: Ubuntu 24.04
+- Creates test user: `testuser` (with passwordless sudo)
+- Installs chezmoi via get.chezmoi.io
+- Copies entire dotfiles repo to `~/.local/share/chezmoi`
+- Runs full bootstrap process in container
+- Allows interactive testing in zsh shell
 
 ### Configuration Changes
 
@@ -604,4 +718,33 @@ export VAR_NAME="{{ .machine.section.value }}"
 # Add #!/bin/bash header
 # Add logic (will run once during chezmoi apply)
 # Higher NN = runs later (00, 01, 02, etc.)
+```
+
+### Add a new fish shell function
+```bash
+# Edit dot_config/private_fish/functions/new_function.fish
+# Create new file with function definition
+# Fish auto-loads functions from this directory
+# Apply changes
+chezmoi apply
+```
+
+### Configure tmux
+```bash
+# Edit dot_tmux.conf
+# Add new key bindings or settings
+# Apply changes
+chezmoi apply
+# Reload tmux config
+tmux source-file ~/.tmux.conf
+# Or use the key binding: C-a r
+```
+
+### Add a fisher plugin (Fish shell)
+```bash
+# Edit dot_config/private_fish/fish_plugins
+# Add plugin URL or name
+# Apply changes
+chezmoi apply
+# In fish shell: fisher update
 ```
