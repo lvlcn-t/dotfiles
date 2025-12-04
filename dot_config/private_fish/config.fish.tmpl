@@ -2,6 +2,8 @@ if status is-interactive
     # Commands to run in interactive sessions can go here
 end
 
+set fish_greeting
+
 {{- if .machine.proxy.enabled }}
 # Proxy configuration - must be set before other commands
 set -gx HTTP_PROXY {{ .machine.proxy.http }}
@@ -86,8 +88,15 @@ if test -f $HOME/.claudevars
     bass source $HOME/.claudevars
 end
 
-abbr --add gcs "git commit --signoff"
-abbr --add gcsm "git commit --signoff -m"
+function git_current_branch
+    git rev-parse --abbrev-ref HEAD 2>/dev/null
+end
+
+abbr --add gcs --position command "git commit --signoff"
+abbr --add gcsm --position command "git commit --signoff -m"
+abbr --add gpsup --position command "git push --set-upstream origin (git_current_branch)"
+abbr --add gpf --position command "git push --force-with-lease --force-if-includes"
+abbr --add gpf! --position command "git push --force"
 
 # Git-town aliases
 if command -v git-town &>/dev/null
