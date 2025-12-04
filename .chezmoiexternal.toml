@@ -1,6 +1,4 @@
 [".config/nvim"]
-type = "archive"
-url = "https://github.com/lvlcn-t/kickstart.nvim/archive/master.tar.gz"
-exact = true
-stripComponents = 1
-refreshPeriod = "220h"
+type = "git-repo"
+url = "git@github.com:lvlcn-t/kickstart.nvim.git"
+
