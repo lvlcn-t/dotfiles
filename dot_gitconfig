@@ -30,13 +30,20 @@
         signoff = true
 
 [diff]
-    tool = nvimdiff
+	tool = difft
 
 [difftool]
     prompt = false
 
 [difftool "nvimdiff"]
     cmd = "nvim -d \"$LOCAL\" \"$REMOTE\""
+
+[difftool "difft"]
+	cmd = difft --display=side-by-side \"$LOCAL\" \"$REMOTE\"
+	trustExitCode = true
+
+[alias]
+	diffd = difftool --dir-diff
 
 [merge]
     tool = nvimdiff
@@ -52,3 +59,6 @@
        clean = git-lfs clean -- %f
        smudge = git-lfs smudge -- %f
        process = git-lfs filter-process
+
+[credential "https://gitlab.devops.telekom.de"]
+	helper = !/home/linuxbrew/.linuxbrew/Cellar/glab/1.78.3/bin/glab auth git-credential

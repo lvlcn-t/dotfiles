@@ -71,7 +71,7 @@ for package in "${necessary_packages[@]}"; do
   install_or_update "$package"
 done
 
-if [ "$SHELL" != "$(command -v zsh)" ]; then
+if [ "$SHELL" != "$(command -v zsh)" ] && [ "$SHELL" != "$(command -v fish)" ]; then
   echo "Setting zsh as the default shell"
   sudo chsh -s "$(command -v zsh)" "$(whoami)"
 fi

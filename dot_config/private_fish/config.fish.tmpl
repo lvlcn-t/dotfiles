@@ -23,6 +23,9 @@ bind tab complete-and-search
 bind ctrl-j forward-char
 bind ctrl-h backward-kill-path-component
 
+# Rebind the file fzf to CTRL ALT F (which results on è on EURKEY layout)
+fzf_configure_bindings --directory=è
+
 # Locale
 set -gx LANG C.UTF-8
 
@@ -88,15 +91,12 @@ if test -f $HOME/.claudevars
     bass source $HOME/.claudevars
 end
 
-function git_current_branch
-    git rev-parse --abbrev-ref HEAD 2>/dev/null
-end
-
 abbr --add gcs --position command "git commit --signoff"
 abbr --add gcsm --position command "git commit --signoff -m"
 abbr --add gpsup --position command "git push --set-upstream origin (git_current_branch)"
 abbr --add gpf --position command "git push --force-with-lease --force-if-includes"
 abbr --add gpf! --position command "git push --force"
+abbr --add gcm --position command "git checkout (git_main_branch)"
 
 # Git-town aliases
 if command -v git-town &>/dev/null
@@ -137,6 +137,16 @@ end
 # fastfetch alias
 if command -v fastfetch &>/dev/null
     alias neofetch="fastfetch"
+end
+
+# j alias
+if command -v z &>/dev/null
+    alias j="z"
+end
+
+# markdownlint alias
+if command -v markdownlint-cli2 &>/dev/null
+    alias markdownlint="markdownlint-cli2"
 end
 
 # Flox environment
