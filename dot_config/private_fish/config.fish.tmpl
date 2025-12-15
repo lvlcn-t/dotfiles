@@ -149,6 +149,8 @@ if command -v markdownlint-cli2 &>/dev/null
     alias markdownlint="markdownlint-cli2"
 end
 
+fish_add_path /home/tom/.opencode/bin
+
 # Flox environment
 if test -d $HOME/.local/share/flox
     alias flo="flox activate -d $HOME/.local/share/flox"

@@ -1,0 +1,34 @@
+plugins:
+  edit-secret:
+    # Setup:
+    #  brew install krew
+    #  kubectl krew install modify-secret
+    #  echo "export XDG_CONFIG_HOME=~/.config" >> ~/.zshrc   # this may or may not be required now
+    # See also:
+    #  https://github.com/derailed/k9s/issues/1017#issuecomment-1328330026
+    shortCut: Ctrl-X
+    confirm: false
+    description: "Edit Decoded Secret"
+    scopes:
+      - secrets
+    command: kubectl
+    background: false
+    args:
+      - modify-secret
+      - --namespace
+      - $NAMESPACE
+      - --context
+      - $CONTEXT
+      - $NAME
+
+  ssh-node:
+    shortCut: s
+    description: "Connect to node"
+    scopes:
+      - nodes
+    command: bash
+    background: false
+    args:
+      - -lc
+      - |
+        "${XDG_CONFIG_HOME:-$HOME/.config}/k9s/scripts/ssh-node.sh" "$CONTEXT" "$NAME"
