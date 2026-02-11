@@ -4,6 +4,10 @@
 # This script sets up the initial configuration for chezmoi so that it can be run
 # without any user interaction beforehand.
 
-if [ ! -f {{ .chezmoi.configFile }} ]; then
-  cp {{ .chezmoi.sourceDir }}/config/chezmoi.toml {{ .chezmoi.configFile }}
+CONFIG_FILE="{{ .chezmoi.configFile }}"
+SOURCE_FILE="{{ .chezmoi.sourceDir }}/config/chezmoi.toml"
+
+if [ ! -f "$CONFIG_FILE" ]; then
+  mkdir -p "$(dirname "$CONFIG_FILE")"
+  cp "$SOURCE_FILE" "$CONFIG_FILE"
 fi

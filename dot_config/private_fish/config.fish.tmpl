@@ -15,7 +15,8 @@ set -gx no_proxy {{ .machine.proxy.no_proxy }}
 {{- end }}
 
 # Homebrew - package manager setup
-eval (/home/linuxbrew/.linuxbrew/bin/brew shellenv)
+set -l brew_prefix (brew --prefix)
+eval ($brew_prefix/bin/brew shellenv)
 
 starship init fish | source
 
@@ -149,7 +150,7 @@ if command -v markdownlint-cli2 &>/dev/null
     alias markdownlint="markdownlint-cli2"
 end
 
-fish_add_path /home/tom/.opencode/bin
+fish_add_path $HOME/.opencode/bin
 
 # Flox environment
 if test -d $HOME/.local/share/flox

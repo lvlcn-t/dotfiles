@@ -20,7 +20,7 @@ export no_proxy={{ .machine.proxy.no_proxy }}
 {{- end }}
 
 # Brew is a package manager for macOS and Linux: https://brew.sh/
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+eval "$($(brew --prefix)/bin/brew shellenv)"
 
 sourceIfExists "$HOME/.zshrc.d/plugins.zsh"
 sourceIfExists "$HOME/.zshrc.d/keybindings.zsh"

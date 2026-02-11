@@ -64,12 +64,16 @@ if ! sudo grep -q "^$(whoami) ALL=(ALL:ALL) NOPASSWD:ALL" /etc/sudoers.d/$(whoam
   sudo chmod 0440 /etc/sudoers.d/$(whoami)
 fi
 
+{{- if ne .chezmoi.os "darwin" }}
 sudo apt update && sudo apt upgrade -qq -y
 
 necessary_packages=(git curl wget zsh tree ca-certificates software-properties-common gpg)
 for package in "${necessary_packages[@]}"; do
   install_or_update "$package"
 done
+
+sudo install -m 0755 -d /etc/apt/keyrings
+{{- end }}
 
 if [ "$SHELL" != "$(command -v zsh)" ] && [ "$SHELL" != "$(command -v fish)" ]; then
   echo "Setting zsh as the default shell"
@@ -79,10 +83,8 @@ fi
 if ! command -v brew &>/dev/null; then
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+eval "$($(brew --prefix)/bin/brew shellenv)"
 brew bundle install --file={{ .chezmoi.sourceDir }}/Brewfile
-
-sudo install -m 0755 -d /etc/apt/keyrings
 
 if ! command -v rustup &>/dev/null; then
   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
@@ -100,6 +102,7 @@ if ! command -v nvm &>/dev/null; then
   PROFILE=/dev/null bash -c 'curl -fsSL -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash'
 fi
 
+{{- if ne .chezmoi.os "darwin" }}
 if ! command -v docker &>/dev/null; then
   if ! keyring_installed "docker.asc"; then
     sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc && sudo chmod a+r /etc/apt/keyrings/docker.asc
@@ -110,6 +113,7 @@ if ! command -v docker &>/dev/null; then
     install_or_update "$package"
   done
 fi
+{{- end }}
 
 if command -v kubectl-krew &>/dev/null; then
   install_kubectl_plugin "ctx"
