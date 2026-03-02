@@ -7,6 +7,7 @@ Welcome to my dotfiles repository! Here you'll find everything you need to set u
 This dotfiles collection includes configurations for multiple shells, development tools, and utilities, along with a Brewfile for managing software installations through Homebrew. Here's a brief overview of each component:
 
 ### Shell Configurations
+
 - 💻 **dot_zshrc**: Customize your Zsh shell environment with modular configuration (aliases, plugins, environment variables, key bindings).
 - 🐚 **dot_config/fish**: Full Fish shell configuration with fisher plugins, custom functions, and completions for an alternative shell experience.
 - 🎨 **dot_p10k.zsh**: Powerlevel10k Zsh theme configuration (fallback prompt).
@@ -14,6 +15,7 @@ This dotfiles collection includes configurations for multiple shells, developmen
 - 🖥️ **dot_tmux.conf**: Tmux terminal multiplexer configuration with custom key bindings (prefix: C-a) and mouse support.
 
 ### Development Tools
+
 - 🌍 **dot_gitconfig**: Global Git settings with automatic SSH signing, signoff, and context-aware configurations.
 - 🏡 **dot_gitconfig-personal** & 💼 **dot_gitconfig-work**: Automatically apply specific Git configurations based on repository remote URL (GitHub vs GitLab).
 - 🗝️ **dot_netrc**: Store credentials for accessing remote servers with automated authentication.

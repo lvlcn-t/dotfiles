@@ -121,7 +121,19 @@ if command -v gh &>/dev/null
 end
 
 # GitLab aliases
-if command -v glab &>/dev/null
+if command -v glab >/dev/null 2>&1
+    if test -z "$GITLAB_HOST"; or test -z "$GITLAB_TOKEN"
+        {{- $picked := false }}
+        {{- range $_, $machine := .netrc.machines }}
+            {{- if and (not $picked) (contains "gitlab" $machine.url) }}
+                set -gx GITLAB_HOST "https://{{ $machine.url }}"
+                set -gx GITLAB_TOKEN {{ $machine.token | quote }}
+                set -gx GITLAB_API_TOKEN $GITLAB_TOKEN
+                {{- $picked = true }}
+            {{- end }}
+        {{- end }}
+    end
+
     alias gpsci="git push -o ci.skip"
 end
 
