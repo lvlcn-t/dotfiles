@@ -9,12 +9,28 @@
       "type": "remote",
       "url": "https://mcp.exa.ai/mcp"
     },
+    "telecontext": {
+      "type": "remote",
+      "url": "https://telecontext.trap.ng.telekom.net/mcp"
+    },
     "morph": {
       "type": "local",
       "command": ["bunx", "@morphllm/morphmcp"],
       "environment": {
         "ENABLED_TOOLS": "warp_grep"
       }
+    },
+    "azure": {
+      "type": "local",
+      "command": [
+        "bunx",
+        "@azure/mcp",
+        "server",
+        "start",
+        "--mode",
+        "namespace",
+        "--read-only"
+      ]
     }
   },
   "provider": {
@@ -57,6 +73,18 @@
       "model": "github-copilot/claude-sonnet-4.6"
     },
     "docs": {
+      "model": "github-copilot/claude-sonnet-4.6"
+    },
+    "platform-engineer": {
+      "model": "github-copilot/claude-sonnet-4.6"
+    },
+    "platform-architect": {
+      "model": "azure-anthropic/claude-opus-4-6"
+    },
+    "platform-iac": {
+      "model": "github-copilot/claude-sonnet-4.6"
+    },
+    "platform-gitops": {
       "model": "github-copilot/claude-sonnet-4.6"
     }
   },

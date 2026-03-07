@@ -27,7 +27,7 @@
 	gpgsign = true
 
 [format]
-        signoff = true
+    signoff = true
 
 [diff]
 	tool = difft
@@ -55,10 +55,10 @@
     cmd = "nvim -d \"$LOCAL\" \"$REMOTE\" \"$MERGED\" -c 'wincmd w' -c 'wincmd J'"
 
 [filter "lfs"]
-       required = true
-       clean = git-lfs clean -- %f
-       smudge = git-lfs smudge -- %f
-       process = git-lfs filter-process
+    required = true
+    clean = git-lfs clean -- %f
+    smudge = git-lfs smudge -- %f
+    process = git-lfs filter-process
 
 [credential "https://gitlab.devops.telekom.de"]
 {{- if ne .chezmoi.os "darwin" }}

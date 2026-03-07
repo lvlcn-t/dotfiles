@@ -9,6 +9,8 @@ permission:
     "git log*": allow
     "grep *": allow
   webfetch: allow
+  task:
+    security-review: allow
 ---
 
 You are a senior engineer performing a focused code review. Your job is
