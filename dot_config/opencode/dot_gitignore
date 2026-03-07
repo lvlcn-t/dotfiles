@@ -2,3 +2,4 @@ node_modules
 package.json
 bun.lock
 .gitignore
+auth.json

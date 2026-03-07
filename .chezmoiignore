@@ -13,6 +13,11 @@ run_once_before_00-setup.sh.tmpl
 run_once_before_01-install-deps.sh.tmpl
 run_once_before_02-cleanup.sh.tmpl
 run_once_before_03-config-wizard.sh.tmpl
+AGENTS.md
+Brewfile
+.chezmoiexternal.toml
+.github/
+.github/**
 
 .venv/
 .venv/**

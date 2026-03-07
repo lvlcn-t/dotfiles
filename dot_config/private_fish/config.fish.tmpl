@@ -128,6 +128,7 @@ if command -v glab >/dev/null 2>&1
             {{- if and (not $picked) (contains "gitlab" $machine.url) }}
                 set -gx GITLAB_HOST "https://{{ $machine.url }}"
                 set -gx GITLAB_TOKEN {{ $machine.token | quote }}
+                set -gx GITLAB_INSTANCE_URL $GITLAB_HOST
                 set -gx GITLAB_API_TOKEN $GITLAB_TOKEN
                 {{- $picked = true }}
             {{- end }}
@@ -150,11 +151,6 @@ end
 # fastfetch alias
 if command -v fastfetch &>/dev/null
     alias neofetch="fastfetch"
-end
-
-# j alias
-if command -v z &>/dev/null
-    alias j="z"
 end
 
 # markdownlint alias

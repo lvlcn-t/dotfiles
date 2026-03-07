@@ -61,4 +61,8 @@
        process = git-lfs filter-process
 
 [credential "https://gitlab.devops.telekom.de"]
-	helper = !/home/linuxbrew/.linuxbrew/Cellar/glab/1.78.3/bin/glab auth git-credential
+{{- if ne .chezmoi.os "darwin" }}
+	helper = !/home/linuxbrew/.linuxbrew/bin/glab auth git-credential
+{{- else }}
+	helper = !/opt/homebrew/bin/glab auth git-credential
+{{- end }}

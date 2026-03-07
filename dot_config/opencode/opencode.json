@@ -7,14 +7,58 @@
     },
     "exa": {
       "type": "remote",
-      "url": "https://mcp.exa.ai/mcp",
+      "url": "https://mcp.exa.ai/mcp"
     },
     "morph": {
       "type": "local",
       "command": ["bunx", "@morphllm/morphmcp"],
       "environment": {
-        "ENABLED_TOOLS": "warp_grep",
-      },
+        "ENABLED_TOOLS": "warp_grep"
+      }
     }
-  }
+  },
+  "provider": {
+    "gitlab": {
+      "options": {
+        "instanceUrl": "https://gitlab.devops.telekom.de",
+        "featureFlags": {
+          "duo_agent_platform_agentic_chat": true,
+          "duo_agent_platform": true
+        }
+      }
+    },
+    "azure-anthropic": {
+      "name": "Azure AI Foundry (Anthropic)",
+      "npm": "@ai-sdk/anthropic",
+      "api": "https://aif-tom-dev.services.ai.azure.com/anthropic/v1",
+      "models": {
+        "claude-opus-4-6": {
+          "id": "claude-opus-4-6",
+          "name": "Claude Opus 4.6",
+          "tool_call": true,
+          "attachment": true,
+          "reasoning": true,
+          "temperature": true
+        }
+      }
+    }
+  },
+  "agent": {
+    "build": {
+      "model": "github-copilot/gpt-5.3-codex"
+    },
+    "plan": {
+      "model": "github-copilot/claude-sonnet-4.6"
+    },
+    "security-review": {
+      "model": "azure-anthropic/claude-opus-4-6"
+    },
+    "review": {
+      "model": "github-copilot/claude-sonnet-4.6"
+    },
+    "docs": {
+      "model": "github-copilot/claude-sonnet-4.6"
+    }
+  },
+  "plugin": ["@gitlab/opencode-gitlab-plugin", "opencode-wakatime"]
 }
