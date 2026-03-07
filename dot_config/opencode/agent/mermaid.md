@@ -1,5 +1,7 @@
 ---
+name: mermaid
 description: Create Mermaid diagrams for flowcharts, sequences, ERDs, and architectures. Masters syntax for all diagram types and styling. Use PROACTIVELY for visual documentation, system diagrams, or process flows.
+model: github-copilot/gpt-5.3-codex
 mode: subagent
 hidden: true
 ---

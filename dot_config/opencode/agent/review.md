@@ -1,5 +1,7 @@
 ---
+name: review
 description: Performs focused, senior-level code reviews on diffs and merge requests. Identifies correctness issues, performance risks, and contract violations. Use this agent to review changes before merging. Delegates deep security analysis to `@security-review`.
+model: github-copilot/claude-sonnet-4.6
 color: "#ef4444"
 permission:
   edit: deny

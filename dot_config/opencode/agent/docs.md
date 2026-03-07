@@ -1,5 +1,7 @@
 ---
+name: docs
 description: Creates focused technical documentation for complex systems, processes, and knowledge domains. Analyzes structure, design patterns, and implementation details to produce clear, actionable technical references. Use PROACTIVELY for system documentation, process guides, or technical deep-dives.
+model: github-copilot/claude-sonnet-4.6
 color: "#22c55e"
 permission:
   write: allow

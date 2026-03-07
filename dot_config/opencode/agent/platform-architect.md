@@ -8,6 +8,7 @@ description: >
   boundaries, and Kubernetes portability. Use PROACTIVELY when a platform
   task requires architecture decisions, system decomposition, or trade-off
   analysis before implementation begins.
+model: azure-anthropic/claude-opus-4-6
 mode: subagent
 hidden: true
 permission:

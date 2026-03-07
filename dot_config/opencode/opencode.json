@@ -65,27 +65,6 @@
     },
     "plan": {
       "model": "github-copilot/claude-sonnet-4.6"
-    },
-    "security-review": {
-      "model": "azure-anthropic/claude-opus-4-6"
-    },
-    "review": {
-      "model": "github-copilot/claude-sonnet-4.6"
-    },
-    "docs": {
-      "model": "github-copilot/claude-sonnet-4.6"
-    },
-    "platform-engineer": {
-      "model": "github-copilot/claude-sonnet-4.6"
-    },
-    "platform-architect": {
-      "model": "azure-anthropic/claude-opus-4-6"
-    },
-    "platform-iac": {
-      "model": "github-copilot/claude-sonnet-4.6"
-    },
-    "platform-gitops": {
-      "model": "github-copilot/claude-sonnet-4.6"
     }
   },
   "plugin": ["@gitlab/opencode-gitlab-plugin", "opencode-wakatime"]

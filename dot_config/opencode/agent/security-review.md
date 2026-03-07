@@ -1,6 +1,7 @@
 ---
 name: security-review
 description: Deep security and reliability analysis for code changes. Identifies vulnerabilities, injection risks, secrets exposure, unsafe concurrency, and resource leaks. Delegate to this agent when a diff touches auth, crypto, input handling, or infrastructure.
+model: azure-anthropic/claude-opus-4-6
 mode: subagent
 hidden: true
 ---

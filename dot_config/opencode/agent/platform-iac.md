@@ -8,6 +8,7 @@ description: >
   patterns as non-negotiable defaults. Use when you need IaC implementation
   for Azure resources, module design, state management, or reviewing existing
   Bicep/Terraform for correctness and compliance.
+model: github-copilot/claude-sonnet-4.6
 mode: subagent
 hidden: true
 permission:

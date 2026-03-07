@@ -9,6 +9,7 @@ description: >
   Use PROACTIVELY for platform design, Azure automation, IaC scaffolding,
   GitOps setup, or any developer workflow that should be replaced by a
   declarative system.
+model: github-copilot/claude-sonnet-4.6
 color: "#f59e0b"
 permission:
   task:

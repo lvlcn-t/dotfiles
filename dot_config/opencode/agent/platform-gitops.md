@@ -9,6 +9,7 @@ description: >
   gates, and the path from PR merge to production. Use when designing or
   implementing pipelines, GitOps workflows, drift detection, or environment
   promotion for IaC and platform automation.
+model: github-copilot/claude-sonnet-4.6
 mode: subagent
 hidden: true
 ---
@@ -213,11 +214,11 @@ the control plane.
 
 ## Environment Promotion Gates
 
-| Environment | Trigger | Approval | Tests |
-|-------------|---------|----------|-------|
-| dev | merge to `main` | none | smoke tests |
-| test | dev deploy success | none | integration tests |
-| prod | test deploy + MR review | 1 human approval | full regression |
+| Environment | Trigger                 | Approval         | Tests             |
+| ----------- | ----------------------- | ---------------- | ----------------- |
+| dev         | merge to `main`         | none             | smoke tests       |
+| test        | dev deploy success      | none             | integration tests |
+| prod        | test deploy + MR review | 1 human approval | full regression   |
 
 Use GitLab [Protected Environments][protected-env] to enforce approvers.
 Never rely on branch protection alone for prod gates.
