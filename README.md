@@ -1,76 +1,89 @@
 # dotfiles 🛠️
 
-Welcome to my dotfiles repository! Here you'll find everything you need to set up and maintain a consistent and productive development environment across different machines. Dotfiles are configuration files that customize and automate the setup of software applications and tools on Unix/Linux systems. By managing these files in a repository, you can easily synchronize your preferences and settings across multiple environments.
+Dotfiles managed by [chezmoi](https://chezmoi.io/) for a consistent development
+environment on Linux/WSL and macOS machines. Includes shell configs, development
+tools, and a bootstrap script that wires everything together.
 
-## About This Component 📝
+## What's here
 
-This dotfiles collection includes configurations for multiple shells, development tools, and utilities, along with a Brewfile for managing software installations through Homebrew. Here's a brief overview of each component:
+### Shells
 
-### Shell Configurations
+- **dot_zshrc** + **dot_zshrc.d/**: Zsh with modular config (aliases, plugins,
+  environment variables, key bindings).
+- **dot_config/fish/**: Fish shell — primary shell with
+  [fisher](https://github.com/jorgebucaran/fisher) plugins, custom functions,
+  fzf bindings, starship prompt, and Zoxide navigation.
+- **dot_config/starship.toml**: Starship prompt with Gruvbox Dark theme and
+  multi-language support (used by both Zsh and Fish).
+- **dot_p10k.zsh**: Powerlevel10k fallback theme for Zsh.
+- **dot_tmux.conf**: Tmux with `C-a` prefix and mouse support.
 
-- 💻 **dot_zshrc**: Customize your Zsh shell environment with modular configuration (aliases, plugins, environment variables, key bindings).
-- 🐚 **dot_config/fish**: Full Fish shell configuration with fisher plugins, custom functions, and completions for an alternative shell experience.
-- 🎨 **dot_p10k.zsh**: Powerlevel10k Zsh theme configuration (fallback prompt).
-- ⭐ **dot_config/starship.toml**: Starship prompt configuration (primary prompt) with Gruvbox Dark theme and multi-language support.
-- 🖥️ **dot_tmux.conf**: Tmux terminal multiplexer configuration with custom key bindings (prefix: C-a) and mouse support.
+### Git
 
-### Development Tools
+- **dot_gitconfig.tmpl**: Global Git settings — SSH signing, automatic signoff,
+  difftastic, and Git LFS. The `glab` credential helper path is templated per
+  OS (Linux vs macOS).
+- **dot_gitconfig-personal** / **dot_gitconfig-work**: Applied automatically via
+  `includeIf hasconfig:remote.*.url` based on whether the remote is GitHub or
+  the internal GitLab instance.
 
-- 🌍 **dot_gitconfig**: Global Git settings with automatic SSH signing, signoff, and context-aware configurations.
-- 🏡 **dot_gitconfig-personal** & 💼 **dot_gitconfig-work**: Automatically apply specific Git configurations based on repository remote URL (GitHub vs GitLab).
-- 🗝️ **dot_netrc**: Store credentials for accessing remote servers with automated authentication.
-- 📥 **dot_wgetrc**: Customize wget download options.
-- 📦 **dot_npmrc**: Manage npm settings for node packages.
-- 🍺 **Brewfile**: 65+ packages including Kubernetes tools (kubectl, helm, k9s, argocd), cloud CLIs (AWS, Azure), development languages (Go, Python 3.14), and productivity utilities (bat, eza, fzf, ripgrep).
+### Tools
 
-Feel free to explore and adapt these configurations to suit your own development needs and preferences. Happy coding! 😄
+- **dot_config/k9s/**: k9s Kubernetes TUI — config, resource aliases, and
+  plugins (including a `ssh-node.sh` helper).
+- **dot_config/opencode/**: [opencode](https://opencode.ai) AI assistant — MCP
+  servers, custom agents, and the `/review` slash command. See
+  [dot_config/opencode/README.md](dot_config/opencode/README.md).
+- **Brewfile**: ~65 packages — Kubernetes tools (kubectl, helm, k9s, argocd),
+  cloud CLIs (awscli, azure-cli, azd), development languages (Go, Python 3.14),
+  IaC tooling (terraform, kcl, helm-docs), and productivity utilities (bat, eza,
+  fzf, ripgrep, lazygit).
 
-## Installation 🚀
+## Installation
 
-**Warning:** This installation process will **overwrite** any existing configuration files. Make sure to back up your current dotfiles before proceeding.
-
-To install my dotfiles, simply run the following command in your terminal:
+> [!WARNING]
+> This will overwrite existing config files. Back up your dotfiles first.
 
 ```bash
 sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply lvlcn-t
 ```
 
-This command will install [chezmoi](https://chezmoi.io/) and apply my dotfiles to your system. Chezmoi is a tool for managing dotfiles across multiple machines, providing a simple and secure way to handle your configuration files. For more information, check out the [official documentation](https://www.chezmoi.io/docs/).
+### What gets bootstrapped
 
-### What Gets Installed
+- Passwordless `sudo` for `$USER`.
+- Zsh as default shell (or Fish, if already set).
+- Fish shell with fisher plugins: fzf, git, kubectl-aliases, tmux, One Dark
+  theme, nvm, Zoxide (`z`), and `bass` for sourcing bash scripts.
+- All dependencies from [`Brewfile`](Brewfile) via [Homebrew](https://brew.sh/).
+- Starship prompt with Gruvbox theme; Powerlevel10k as Zsh fallback.
+- Tmux configuration with intuitive key bindings.
+- Git with SSH signing, auto-signoff, difftastic, and context-specific configs.
+- Neovim from [kickstart.nvim](https://github.com/lvlcn-t/kickstart.nvim).
+- Rust (rustup), Node.js (nvm), Python (Poetry).
+- Docker — Linux/WSL only (skipped on macOS).
+- Homebrew path resolved dynamically (`brew --prefix`) — works on both Linux
+  (`/home/linuxbrew/.linuxbrew`) and macOS (`/opt/homebrew`).
+- pre-commit hooks with gitleaks for secret scanning.
 
-My dotfiles will bootstrap your system with the following:
-- Passwordless `sudo` access for `$USER`.
-- Zsh as the default shell with [zplug](https://github.com/zplug/zplug) plugin manager.
-- Fish shell (alternative) with [fisher](https://github.com/jorgebucaran/fisher) plugin manager.
-- Install all 65+ dependencies from [`Brewfile`](Brewfile) using [Homebrew](https://brew.sh/).
-- [Starship](https://starship.rs/) prompt (primary) with custom Gruvbox theme.
-- Powerlevel10k theme (fallback) from [`dot_p10k.zsh`](dot_p10k.zsh).
-- Tmux configuration with intuitive key bindings and mouse support.
-- Git with SSH signing, auto-signoff, and context-specific configs ([`dot_gitconfig-personal`](dot_gitconfig-personal), [`dot_gitconfig-work`](dot_gitconfig-work)).
-- Neovim configuration from [kickstart.nvim](https://github.com/lvlcn-t/kickstart.nvim).
-- Python environment with Poetry for running the configuration wizard.
-- Development tools: kubectl, helm, k9s, argocd, AWS CLI, Azure CLI, Go, Python 3.14, and more.
-- Security: pre-commit hooks with gitleaks for secret scanning.
+### Post-installation
 
-### Post-Installation
+The interactive wizard (`make prep`) prompts for:
 
-After installation, the interactive configuration wizard will prompt you to configure:
-- **Netrc credentials**: GitHub and GitLab tokens for private repository access.
-- **Proxy settings**: HTTP/HTTPS proxy configuration (optional).
-- **Conjur integration**: Secret management configuration (optional).
+- **Netrc credentials**: GitHub and GitLab tokens for private repo access.
+- **Proxy settings**: HTTP/HTTPS proxy (optional).
+- **Conjur integration**: Secret management (optional).
 
-You can skip any section to preserve existing configuration or re-run the wizard anytime with `make prep`.
+Skip any section to preserve existing config, or re-run anytime with
+`make prep`.
 
-## Usage 🎯
-
-### Common Commands
+## Common commands
 
 ```bash
-# Apply dotfiles changes
-chezmoi apply
+chezmoi apply           # apply dotfiles to the system
+chezmoi diff            # preview pending changes
+chezmoi apply --verbose # verbose apply
+make prep               # re-run the config wizard
+make debug              # test bootstrap in Docker (Ubuntu 24.04)
 ```
 
-For AI agents and detailed technical documentation, see [AGENTS.md](AGENTS.md).
-
-Feel free to adapt these steps to your specific needs!
+For AI agents and detailed repo conventions, see [AGENTS.md](AGENTS.md).
