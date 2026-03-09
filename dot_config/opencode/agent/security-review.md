@@ -23,7 +23,7 @@ vulnerabilities, reliability risks, and defensive-coding gaps.
 
 ## Severity Classification
 
-```
+```text
 Critical  → Exploitable now, data loss or unauthorized access
 High      → Exploitable with effort, or reliability risk under load
 Medium    → Defense-in-depth gap, not directly exploitable

@@ -37,25 +37,25 @@ standards: modular, parameterised, versioned, and fully automated.
 
 ## Bicep Authoring Standards
 
-### Module Structure
+### Mono-repo (preferred for platform independent apps)
 
+```text
+infra/                 # All IaC modules live here
+  <app>.bicep          # Bicep module referencing shared modules
+overlays/
+  dev.bicepparam       # Dev parameters, referencing bicep module by `br:` reference
+  prod.bicepparam      # Prod parameters, referencing bicep module by `br:` reference
+.gitlab-ci.yml         # Pipeline that releases the infra/<app>.bicep module to ACR and deploys overlays on conditions
 ```
-modules/
-  <resource-type>/
-    main.bicep          # Resource definitions
-    main.bicepparam     # Parameter file (per-environment)
-    README.md           # Auto-generated or minimal usage guide
-infra/
-  environments/
-    dev/
-      main.bicep        # Composition root — assembles modules
-      main.bicepparam
-    test/
-      main.bicep
-      main.bicepparam
-    prod/
-      main.bicep
-      main.bicepparam
+
+### Multi-repo (preferred for platform services)
+
+```text
+bicep-modules/              # Versioned shared bicep modules (own git and ACR repo)
+terraform-modules/          # Versioned shared terraform modules (own git repo)
+policies/                   # Azure Policy definitions (own git repo; own lifecycle)
+<app-repo>/overlays/        # App-specific environment overlays through `.bicepparam` or `.tfvars`
+<app-repo>/.gitlab-ci.yml   # App-specific pipeline that calls shared module repos
 ```
 
 ### Parameter Design
@@ -79,7 +79,8 @@ param tags object = {
 
 ### Secure Parameters via Key Vault References
 
-In `.bicepparam` files, always reference Key Vault for secrets:
+In `.bicepparam` files, always reference Key Vault or
+GitLab CI/CD masked variables for secrets:
 
 ```bicep
 using './main.bicep'
@@ -121,7 +122,7 @@ resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
 Use a consistent naming function or module. Prefer:
 
 ```bicep
-var resourcePrefix = '${workloadName}-${environment}-${locationShort}'
+var name = '${resourceType}-${workloadName}-${environment}'
 ```
 
 Follow [Azure naming conventions][azure-naming] and enforce character
@@ -129,98 +130,16 @@ limits with `@maxLength`.
 
 [azure-naming]: https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/resource-naming
 
-## Terraform / OpenTofu Authoring Standards
-
-### Module Layout
-
-```
-modules/
-  <resource-type>/
-    main.tf
-    variables.tf
-    outputs.tf
-    versions.tf     # required_providers pinned to minor version
-    README.md
-environments/
-  dev/
-    main.tf         # module calls only — no resource blocks
-    terraform.tfvars
-    backend.tf
-  test/
-    ...
-  prod/
-    ...
-```
-
-### Provider & Version Pinning
-
-```hcl
-terraform {
-  required_version = ">= 1.9.0"
-
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "~> 4.0"
-    }
-  }
-
-  backend "azurerm" {
-    # values supplied via -backend-config at init time, not hardcoded
-  }
-}
-```
-
-### Authentication — No Static Credentials
-
-```hcl
-provider "azurerm" {
-  features {}
-  # Auth via OIDC (Workload Identity Federation) in CI/CD:
-  #   ARM_CLIENT_ID, ARM_TENANT_ID, ARM_SUBSCRIPTION_ID set by pipeline
-  #   ARM_USE_OIDC = true
-  # Auth via Managed Identity when running on Azure compute.
-  # Never set ARM_CLIENT_SECRET.
-}
-```
-
-### Variable Design
-
-```hcl
-variable "environment" {
-  description = "Environment tier. Controls SKU and redundancy settings."
-  type        = string
-  validation {
-    condition     = contains(["dev", "test", "prod"], var.environment)
-    error_message = "Must be dev, test, or prod."
-  }
-}
-
-variable "tags" {
-  description = "Tags applied to all resources."
-  type        = map(string)
-  default     = {}
-}
-```
+## Terraform/OpenTofu Authoring Standards
 
 ### State Backend
 
-Remote state in Azure Storage with:
-
-- Storage account in a dedicated platform subscription
-- Private endpoint or service endpoint — no public blob access in prod
-- Separate state container per environment
-- Storage account key accessed only via Managed Identity + RBAC
+Remote state using GitLab's built-in Terraform state management.
 
 ```hcl
-# backend.tf (values provided at `terraform init -backend-config=...`)
+# backend.tf
 terraform {
-  backend "azurerm" {
-    resource_group_name  = "rg-tfstate-platform"
-    storage_account_name = "sttfstateplatform"
-    container_name       = "tfstate-prod"
-    key                  = "platform/network.tfstate"
-    use_azuread_auth     = true  # RBAC, no storage account key
+  backend "http" {
   }
 }
 ```
@@ -230,11 +149,12 @@ terraform {
 Each environment directory is a separate deployment root. Modules are
 shared. Parameter/variable files differ per environment.
 
-```
-              ┌─────────┐     ┌─────────┐     ┌──────────┐
-  Git PR  ──▶ │   dev   │ ──▶ │  test   │ ──▶ │   prod   │
-              └─────────┘     └─────────┘     └──────────┘
-               auto-deploy     auto-deploy      approval gate
+```text
+                 ┌─────────┐     ┌──────────┐
+  GitLab MR  ──▶ │   dev   │ ──▶ │   prod   │
+                 └─────────┘     └──────────┘
+                  deploy on      approval gate
+                  `-rc` tag      on stable tag
 ```
 
 The same module is used at every tier. Differences live in parameter
@@ -244,25 +164,14 @@ files only.
 
 - [ ] No secrets, passwords, or tokens in any file
 - [ ] Every resource is tagged
+- [ ] Parameters only include what differs between environments;
+      Everything else should be hardcoded in module variables.
 - [ ] All parameters have `@description` (Bicep) or `description` (TF)
 - [ ] Deployment is idempotent (re-running produces no changes)
 - [ ] Role assignments use `guid()` deterministic naming
 - [ ] Private endpoints configured for Key Vault, Storage, SQL in prod
 - [ ] `dependsOn` or resource references replace implicit ordering
 - [ ] Module outputs expose only what callers need
-
-## Kubernetes Portability Notes
-
-When implementing Azure-native resources, note where the Kubernetes
-equivalent would slot in:
-
-- Azure Container Apps → Kubernetes Deployment + Service
-- Azure Functions → Kubernetes CronJob or Knative Function
-- Key Vault + MI → External Secrets Operator + Service Account
-- Azure Service Bus → KEDA trigger source
-
-Document these mappings as comments in the IaC so the migration path
-is visible to future readers.
 
 ## Security Review Hand-Off
 

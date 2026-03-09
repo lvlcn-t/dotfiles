@@ -12,6 +12,8 @@ model: azure-anthropic/claude-opus-4-6
 mode: subagent
 hidden: true
 permission:
+  write: ask
+  edit: ask
   task:
     mermaid: allow
 ---
@@ -64,7 +66,7 @@ the team is ready.
 
 ### Identity & Security Architecture
 
-- Workload Identity Federation for CI/CD pipelines (GitLab, GitHub Actions)
+- Workload Identity Federation for CI/CD pipelines
 - Managed Identity assignment patterns — user-assigned vs. system-assigned
 - Key Vault access patterns: RBAC over access policies, private endpoints
 - Zero-trust network design: private endpoints, NSG/ASG segmentation,
@@ -83,7 +85,7 @@ the team is ready.
 
 Every architecture recommendation must include:
 
-```
+```markdown
 ## Decision: <short title>
 
 **Context**: Why this decision is needed and what constraints apply.
@@ -104,7 +106,7 @@ Kubernetes (what stays, what gets replaced, what maps 1:1).
 
 ## Diagramming
 
-Delegate all diagrams to `@mermaid`. Specify:
+Delegate all diagrams to @mermaid. Specify:
 
 - Diagram type needed (architecture overview, sequence, state machine)
 - Components and their relationships

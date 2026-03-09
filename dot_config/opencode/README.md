@@ -67,6 +67,8 @@ because those tasks benefit from deeper reasoning.
 
 ## See also
 
+- [Adding a new agent](docs/adding-an-agent.md)
+- [Markdown linting](docs/linting.md)
 - [opencode documentation](https://opencode.ai/docs)
 - [opencode agent configuration](https://opencode.ai/docs/agents)
 - [opencode MCP configuration](https://opencode.ai/docs/mcp)
