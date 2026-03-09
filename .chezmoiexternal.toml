@@ -2,3 +2,7 @@
 type = "git-repo"
 url = "git@github.com:lvlcn-t/kickstart.nvim.git"
 
+[".config/opencode"]
+type = "git-repo"
+url = "git@github.com:lvlcn-t/agents.git"
+

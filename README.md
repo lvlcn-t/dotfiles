@@ -31,9 +31,10 @@ tools, and a bootstrap script that wires everything together.
 
 - **dot_config/k9s/**: k9s Kubernetes TUI — config, resource aliases, and
   plugins (including a `ssh-node.sh` helper).
-- **dot_config/opencode/**: [opencode](https://opencode.ai) AI assistant — MCP
-  servers, custom agents, and the `/review` slash command. See
-  [dot_config/opencode/README.md](dot_config/opencode/README.md).
+- **opencode**: [opencode](https://opencode.ai) AI assistant — MCP servers,
+  custom agents, and the `/review` slash command. Managed via
+  [lvlcn-t/agents](https://github.com/lvlcn-t/agents) (external repo,
+  pulled by `.chezmoiexternal.toml`).
 - **Brewfile**: ~65 packages — Kubernetes tools (kubectl, helm, k9s, argocd),
   cloud CLIs (awscli, azure-cli, azd), development languages (Go, Python 3.14),
   IaC tooling (terraform, kcl, helm-docs), and productivity utilities (bat, eza,

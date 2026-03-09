@@ -1,5 +1,0 @@
-node_modules/
-bun.lock
-agent-frontmatter.cjs
-.markdownlint-cli2.yaml
-docs/*.md
