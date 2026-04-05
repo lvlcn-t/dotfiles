@@ -134,8 +134,17 @@ if command -v glab >/dev/null 2>&1
             {{- end }}
         {{- end }}
     end
+    function glab-clone
+      set group $argv[1]
+      set rest $argv[2..-1]
 
+      glab repo clone -g "$group" -a=false -p --paginate $rest
+    end
     alias gpsci="git push -o ci.skip"
+end
+
+if command -v jira &>/dev/null
+    set -gx JIRA_AUTH_TYPE "bearer"
 end
 
 if command -v gitlab-ci-local &>/dev/null

@@ -18,6 +18,11 @@ url = "https://github.com"
 username = "__token__"
 token = "ghp_xxxxxxx"
 
+[[data.netrc.machines]]
+url = "https://jira.example.com"
+username = "username"
+token = "api_token"
+
 [data.machine.proxy]
 enabled = false
 http = "http://proxy.example.com:8080"

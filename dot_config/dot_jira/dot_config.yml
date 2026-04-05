@@ -1,0 +1,5 @@
+version: 1
+installation: local
+authentication_type: bearer
+server: https://jira.telekom.de
+login: tom.vendolsky@telekom.de
