@@ -1,18 +1,11 @@
 #!/usr/bin/env bash
 # Global prepare-commit-msg hook.
-# 1. Delegate to local repo hook if it exists.
-# 2. Always append Signed-off-by (even after local hook runs).
+# Always append Signed-off-by trailer.
 
 set -euo pipefail
 
 COMMIT_MSG_FILE="$1"
 COMMIT_SOURCE="${2:-}"
-
-# Run local repo hook if present
-LOCAL_HOOK="$(git rev-parse --git-dir 2>/dev/null)/hooks/prepare-commit-msg"
-if [ -x "$LOCAL_HOOK" ]; then
-  "$LOCAL_HOOK" "$@" || exit $?
-fi
 
 # Skip signoff for merges and squashes
 case "$COMMIT_SOURCE" in
