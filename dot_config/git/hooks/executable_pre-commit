@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Global pre-commit hook.
+# 1. If a local repo pre-commit hook exists, run it instead
+#    (local overrides global).
+# 2. Otherwise, run gitleaks on staged changes unless the repo
+#    already configures gitleaks via .pre-commit-config.yaml.
+
+set -euo pipefail
+
+# Delegate to local repo hook if present
+LOCAL_HOOK="$(git rev-parse --git-dir 2>/dev/null)/hooks/pre-commit"
+if [ -x "$LOCAL_HOOK" ]; then
+  exec "$LOCAL_HOOK" "$@"
+fi
+
+# If gitleaks is already managed by pre-commit config, skip
+if [ -f .pre-commit-config.yaml ] &&
+  grep -q 'gitleaks' .pre-commit-config.yaml 2>/dev/null; then
+  exit 0
+fi
+
+# Require gitleaks to be installed
+if ! command -v gitleaks &>/dev/null; then
+  echo "gitleaks not found -- skipping secret scan"
+  exit 0
+fi
+
+gitleaks protect --staged --verbose
