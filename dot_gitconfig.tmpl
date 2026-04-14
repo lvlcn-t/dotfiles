@@ -1,25 +1,23 @@
 [init]
-    defaultBranch = main
-    templateDir = ~/.config/git/templates
+	defaultBranch = main
+	templateDir = ~/.config/git/templates
 
 [user]
 	name = lvlcn-t
 	email = 75443136+lvlcn-t@users.noreply.github.com
+	signingkey = ~/.ssh/id_rsa.pub
 
 [includeIf "hasconfig:remote.*.url:git@github.com*/**"]
-    path = .gitconfig-personal
+	path = .gitconfig-personal
 
 [includeIf "hasconfig:remote.*.url:git@gitlab.devops.telekom.de*/**"]
-    path = .gitconfig-work
+	path = .gitconfig-work
 
 [includeIf "hasconfig:remote.*.url:https://github.com/**"]
-    path = .gitconfig-personal
+	path = .gitconfig-personal
 
 [includeIf "hasconfig:remote.*.url:https://gitlab.devops.telekom.de/**"]
-    path = .gitconfig-work
-
-[user]
-    signingkey = ~/.ssh/id_rsa.pub
+	path = .gitconfig-work
 
 [gpg]
 	format = ssh
@@ -28,42 +26,58 @@
 	gpgsign = true
 
 [format]
-    signoff = true
+	signoff = true
+
+[push]
+	autoSetupRemote = true
+
+[pull]
+	rebase = true
+
+[rebase]
+	autoStash = true
+
+[fetch]
+	prune = true
+
+[rerere]
+	enabled = true
+	autoUpdate = true
 
 [diff]
 	tool = difft
+	colorMoved = default
 
 [difftool]
-    prompt = false
+	prompt = false
 
 [difftool "nvimdiff"]
-    cmd = "nvim -d \"$LOCAL\" \"$REMOTE\""
+	cmd = "nvim -d \"$LOCAL\" \"$REMOTE\""
 
 [difftool "difft"]
-	cmd = difft --display=side-by-side \"$LOCAL\" \"$REMOTE\"
+	cmd = difft --display=side-by-side "$LOCAL" "$REMOTE"
 	trustExitCode = true
 
 [alias]
 	diffd = difftool --dir-diff
 
 [merge]
-    tool = nvimdiff
+	tool = nvimdiff
 
 [mergetool]
-    prompt = true
+	prompt = true
 
 [mergetool "nvimdiff"]
-    cmd = "nvim -d \"$LOCAL\" \"$REMOTE\" \"$MERGED\" -c 'wincmd w' -c 'wincmd J'"
+	cmd = "nvim -d \"$LOCAL\" \"$REMOTE\" \"$MERGED\" -c 'wincmd w' -c 'wincmd J'"
 
 [filter "lfs"]
-    required = true
-    clean = git-lfs clean -- %f
-    smudge = git-lfs smudge -- %f
-    process = git-lfs filter-process
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
 
 [credential "https://gitlab.devops.telekom.de"]
-{{- if ne .chezmoi.os "darwin" }}
-	helper = !/home/linuxbrew/.linuxbrew/bin/glab auth git-credential
-{{- else }}
-	helper = !/opt/homebrew/bin/glab auth git-credential
+{{- $glab := lookPath "glab" }}
+{{- if $glab }}
+	helper = !{{ $glab }} auth git-credential
 {{- end }}
