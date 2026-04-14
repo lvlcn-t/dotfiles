@@ -147,6 +147,10 @@ if command -v jira &>/dev/null
     set -gx JIRA_AUTH_TYPE "bearer"
 end
 
+if command -v grafana-assistant &>/dev/null
+    abbr -a gas grafana-assistant
+end
+
 if command -v gitlab-ci-local &>/dev/null
     alias gci="gitlab-ci-local"
 end
