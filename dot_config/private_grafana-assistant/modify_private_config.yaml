@@ -1,0 +1,2 @@
+{{- /* chezmoi:modify-template */ -}}
+{{- .chezmoi.stdin | fromYaml | setValueAtPath "current-instance" "dtit" | setValueAtPath (list "instances" "dtit" "url") "https://telekomit.grafana.net" | setValueAtPath (list "instances" "dtit" "api_endpoint") "https://assistant-prod-eu-west-2.grafana.net/assistant" | toYaml -}}

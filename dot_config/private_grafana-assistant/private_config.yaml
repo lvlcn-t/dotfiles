@@ -1,5 +1,0 @@
-current-instance: dtit
-instances:
-    dtit:
-        url: https://telekomit.grafana.net
-        api_endpoint: https://assistant-prod-eu-west-2.grafana.net/assistant

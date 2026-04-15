@@ -6,25 +6,25 @@ on-focus-changed = ['move-mouse window-lazy-center']
 # but you can launch apps via AeroSpace on startup like this:
 after-startup-command = [
     'exec-and-forget open -a Ghostty',
-    'exec-and-forget open -a "Brave Browser"'
+    'exec-and-forget open -a "Brave Browser"',
 ]
 
 # Gaps equivalent (gaps_in = 5, gaps_out = 10)
 [gaps]
 inner.horizontal = 5
-inner.vertical =   5
-outer.left =       10
-outer.bottom =     10
-outer.top =        10
-outer.right =      10
+inner.vertical = 5
+outer.left = 10
+outer.bottom = 10
+outer.top = 10
+outer.right = 10
 
 # Look and feel equivalents
 [mode.main.binding]
 # Main modifier bindings (Super -> Alt/Option)
 alt-enter = 'exec-and-forget open -a Ghostty'
 alt-b = 'exec-and-forget open -a "Brave Browser"'
-alt-e = 'exec-and-forget open -a Finder'   # Nautilus equivalent
-alt-v = 'exec-and-forget open -a Maccy'    # Clipse equivalent
+alt-e = 'exec-and-forget open -a Finder'          # Nautilus equivalent
+alt-v = 'exec-and-forget open -a Maccy'           # Clipse equivalent
 alt-d = 'exec-and-forget open -a Spotlight'
 
 # Window management
@@ -68,6 +68,22 @@ alt-shift-8 = ['move-node-to-workspace 8', 'workspace 8']
 alt-shift-9 = ['move-node-to-workspace 9', 'workspace 9']
 alt-shift-0 = ['move-node-to-workspace 10', 'workspace 10']
 
+# Layout / structure
+alt-slash = 'layout tiles horizontal vertical'
+alt-minus = 'layout accordion horizontal vertical'
+
+# Join windows
+alt-shift-h = 'join-with left'
+alt-shift-l = 'join-with right'
+alt-shift-k = 'join-with up'
+alt-shift-j = 'join-with down'
+
+# Resize
+alt-shift-left = 'resize width -50'
+alt-shift-right = 'resize width +50'
+alt-shift-up = 'resize height +50'
+alt-shift-down = 'resize height -50'
+
 # ==========================================
 # Window Rules (Assigning apps to workspaces)
 # ==========================================
@@ -82,13 +98,12 @@ run = 'move-node-to-workspace 1'
 if.app-name-regex-substring = 'Brave'
 run = 'move-node-to-workspace 2'
 
-# Spotify to Workspace 3
+# Microsoft Teams to Workspace 3
 [[on-window-detected]]
 if.app-name-regex-substring = 'Microsoft Teams'
 run = 'move-node-to-workspace 3'
 
 # Keep standard Mac popups and specific apps floating
 [[on-window-detected]]
-if.app-name-regex-substring = 'Maccy|Raycast|System Settings|Finder'
+if.app-name-regex-substring = 'Maccy|Raycast|System Settings|Finder|Microsoft Teams'
 run = 'layout floating'
-
