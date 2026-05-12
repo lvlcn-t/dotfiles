@@ -23,14 +23,16 @@ outer.right = 10
 # Main modifier bindings (Super -> Alt/Option)
 alt-enter = 'exec-and-forget open -a Ghostty'
 alt-b = 'exec-and-forget open -a "Brave Browser"'
-alt-e = 'exec-and-forget open -a Finder'          # Nautilus equivalent
-alt-v = 'exec-and-forget open -a Maccy'           # Clipse equivalent
+alt-t = 'exec-and-forget open -a "Microsoft Teams"'
+alt-e = 'exec-and-forget open -a Finder'            # Nautilus equivalent
+alt-v = 'exec-and-forget open -a Maccy'             # Clipse equivalent
 alt-d = 'exec-and-forget open -a Spotlight'
 
 # Window management
 alt-q = 'close'
 alt-f = 'fullscreen'
 alt-shift-e = 'exec-and-forget pkill AeroSpace' # Exit AeroSpace
+alt-shift-space = 'layout floating tiling'
 
 # Focus (Arrow keys)
 alt-left = 'focus left'
@@ -98,12 +100,18 @@ run = 'move-node-to-workspace 1'
 if.app-name-regex-substring = 'Brave'
 run = 'move-node-to-workspace 2'
 
-# Microsoft Teams to Workspace 3
+# Microsoft Teams to Workspace 3 and keep floating
 [[on-window-detected]]
 if.app-name-regex-substring = 'Microsoft Teams'
-run = 'move-node-to-workspace 3'
+run = ['move-node-to-workspace 3', 'layout floating']
 
 # Keep standard Mac popups and specific apps floating
 [[on-window-detected]]
-if.app-name-regex-substring = 'Maccy|Raycast|System Settings|Finder|Microsoft Teams'
+if.app-name-regex-substring = 'Maccy|Raycast|System Settings|Finder|FaceTime|KeePassXC|Bitwarden'
+run = 'layout floating'
+
+# Float Outlook reminders
+[[on-window-detected]]
+if.app-name-regex-substring = 'Microsoft Outlook'
+if.window-title-regex-substring = 'Reminder'
 run = 'layout floating'
