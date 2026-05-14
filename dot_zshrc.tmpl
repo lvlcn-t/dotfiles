@@ -9,7 +9,7 @@ if [ ! -z "$PROFILING" ]; then
   zmodload zsh/zprof
 fi
 
-{{- if .machine.proxy.enabled }}
+{{- if and (hasKey . "machine") (hasKey .machine "proxy") .machine.proxy.enabled }}
 # These must be set before any other commands that use the proxy.
 export HTTP_PROXY={{ .machine.proxy.http }}
 export HTTPS_PROXY={{ .machine.proxy.https }}

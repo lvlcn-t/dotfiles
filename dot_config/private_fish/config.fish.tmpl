@@ -4,7 +4,7 @@ end
 
 set fish_greeting
 
-{{- if .machine.proxy.enabled }}
+{{- if and (hasKey . "machine") (hasKey .machine "proxy") .machine.proxy.enabled }}
 # Proxy configuration - must be set before other commands
 set -gx HTTP_PROXY {{ .machine.proxy.http }}
 set -gx HTTPS_PROXY {{ .machine.proxy.https }}
@@ -72,6 +72,7 @@ if command -v func &>/dev/null
 end
 
 # Conjur configuration (if installed)
+{{- if and (hasKey . "machine") (hasKey .machine "conjur") }}
 if test -d $HOME/.local/share/conjur-utils
     set -gx CONJUR_APPLIANCE_URL "{{ .machine.conjur.url }}"
     set -gx CONJUR_ACCOUNT "{{ .machine.conjur.account }}"
@@ -81,6 +82,7 @@ if test -d $HOME/.local/share/conjur-utils
     set -gx CONJUR_CERT_FILE $HOME/.local/share/conjur-utils/conjur-cert.pem
     set -gx CONJUR_AUTHN_TOKEN_FILE $HOME/.local/share/conjur-utils/.conjur-access-token
 end
+{{- end }}
 
 # Load cargo env if it exists
 if test -f $HOME/.cargo/env

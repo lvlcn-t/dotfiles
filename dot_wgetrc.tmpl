@@ -1,4 +1,4 @@
-{{- if .machine.proxy.enabled }}
+{{- if and (hasKey . "machine") (hasKey .machine "proxy") .machine.proxy.enabled }}
 use_proxy=on
 http_proxy={{ .machine.proxy.http }}
 https_proxy={{ .machine.proxy.https }}

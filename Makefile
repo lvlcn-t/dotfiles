@@ -42,14 +42,13 @@ bump-deps: ## 🚀 Bump the dependencies
 	@echo "🏁 Switching back to main branch..."
 	@git checkout main
 
+.PHONY: image
+image: ## 🐳 Builds the Docker image for testing
+	@echo "🐳 Building Docker image..."
+	@docker build -f Dockerfile -t dotfiles .
+	@echo "✅ Docker image built successfully."
+
 .PHONY: debug
-debug: ## 🐛 Debugs the dotfiles
-	@echo "🐳 Building debug Docker container..."
-	@docker build -f Dockerfile -t dotfiles-debug .
-	@echo "🧩 Running container with template rendering and verbose apply..."
-	@docker run -it --rm dotfiles-debug /bin/bash -c "\
-		~/bin/chezmoi execute-template < ~/.local/share/chezmoi/scripts/run_once_before_install-deps.sh.tmpl > ~/.local/share/chezmoi/scripts/script.sh && \
-		chmod +x ~/.local/share/chezmoi/scripts/script.sh && \
-		~/.local/share/chezmoi/scripts/script.sh && \
-		~/bin/chezmoi apply --verbose --force && \
-		zsh"
+debug: image ## 🐛 Debugs the dotfiles
+	@echo "🧩 Running container to apply dotfiles..."
+	@docker run -it --rm dotfiles bash -c "/home/testuser/bin/chezmoi apply --verbose --force && /bin/bash"

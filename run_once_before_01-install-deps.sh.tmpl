@@ -11,7 +11,7 @@ keyring_installed() {
 
 # install_or_update installs/updates a package if it does not exist
 install_or_update() {
-  sudo apt install -qq -y "$1"
+  sudo apt-get install -qq -y "$1"
 }
 
 # add_repo adds an apt repository to the system
@@ -23,7 +23,7 @@ add_repo() {
   if ! grep -q "^deb .*$url" /etc/apt/sources.list /etc/apt/sources.list.d/*; then
     echo "Adding repository: $repo"
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/$keyring] $url $components" | sudo tee /etc/apt/sources.list.d/$repo.list
-    sudo apt update
+    sudo apt-get update
   else
     echo "Repository $repo already exists."
   fi
@@ -39,7 +39,14 @@ install_kubectl_plugin() {
   fi
 }
 
-{{- if not .machine.proxy.enabled }}
+{{- if and (hasKey . "machine") (hasKey .machine "proxy") .machine.proxy.enabled }}
+export HTTP_PROXY={{ .machine.proxy.http }}
+export HTTPS_PROXY={{ .machine.proxy.https }}
+export http_proxy={{ .machine.proxy.http }}
+export https_proxy={{ .machine.proxy.https }}
+export NO_PROXY={{ .machine.proxy.no_proxy }}
+export no_proxy={{ .machine.proxy.no_proxy }}
+{{- else }}
 if [ -z "$HTTP_PROXY" ] && [ -z "$HTTPS_PROXY" ]; then
   read -p "Do you need to set an HTTP/HTTPS Proxy? (y/n): " proxy_required
   if [[ $proxy_required == "y" ]]; then
@@ -49,13 +56,6 @@ if [ -z "$HTTP_PROXY" ] && [ -z "$HTTPS_PROXY" ]; then
     export HTTPS_PROXY=$https_proxy
   fi
 fi
-{{- else }}
-export HTTP_PROXY={{ .machine.proxy.http }}
-export HTTPS_PROXY={{ .machine.proxy.https }}
-export http_proxy={{ .machine.proxy.http }}
-export https_proxy={{ .machine.proxy.https }}
-export NO_PROXY={{ .machine.proxy.no_proxy }}
-export no_proxy={{ .machine.proxy.no_proxy }}
 {{- end }}
 
 if ! sudo grep -q "^$(whoami) ALL=(ALL:ALL) NOPASSWD:ALL" /etc/sudoers.d/$(whoami) 2>/dev/null; then
@@ -80,10 +80,31 @@ if [ "$SHELL" != "$(command -v zsh)" ] && [ "$SHELL" != "$(command -v fish)" ]; 
   sudo chsh -s "$(command -v zsh)" "$(whoami)"
 fi
 
-if ! command -v brew &>/dev/null; then
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-fi
-eval "$($(brew --prefix)/bin/brew shellenv)"
+{{- $brew := findExecutable "brew" (list
+    "/home/linuxbrew/.linuxbrew/bin"
+    "/opt/homebrew/bin"
+    "/usr/local/bin"
+) }}
+
+{{- if $brew }}
+eval "$("{{ $brew }}" shellenv)"
+{{- else }}
+NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+for brew in \
+  /home/linuxbrew/.linuxbrew/bin/brew \
+  /opt/homebrew/bin/brew \
+  /usr/local/bin/brew
+do
+  if [ -x "$brew" ]; then
+    eval "$("$brew" shellenv)"
+    break
+  fi
+  echo "ERROR: Homebrew not found in expected locations. Please check the installation." >&2
+  exit 1
+done
+{{- end }}
+
 brew bundle install --file={{ .chezmoi.sourceDir }}/Brewfile
 
 if ! command -v rustup &>/dev/null; then
