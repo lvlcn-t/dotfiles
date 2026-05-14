@@ -1,0 +1,48 @@
+#!/bin/sh
+
+mode=delete
+delete_flag=-d
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --show|-n|--dry-run)
+      mode=show
+      ;;
+    --force|-f)
+      delete_flag=-D
+      ;;
+    --help|-h)
+      echo "usage: git prune-branches [--show|--dry-run|-n] [--force|-f]"
+      exit 0
+      ;;
+    *)
+      echo "unknown option: $1" >&2
+      echo "usage: git prune-branches [--show|--dry-run|-n] [--force|-f]" >&2
+      exit 2
+      ;;
+  esac
+  shift
+done
+
+git fetch --prune || exit
+
+branches=$(
+  git for-each-ref \
+    --format='%(if:equals=[gone])%(upstream:track)%(then)%(refname:short)%(end)' \
+    refs/heads | sed '/^$/d'
+)
+
+if [ -z "$branches" ]; then
+  echo "No local branches with gone upstreams."
+  exit 0
+fi
+
+if [ "$mode" = show ]; then
+  printf '%s\n' "$branches"
+  exit 0
+fi
+
+printf '%s\n' "$branches" | while IFS= read -r branch; do
+  git branch "$delete_flag" "$branch"
+done
+

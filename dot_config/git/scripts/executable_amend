@@ -1,0 +1,90 @@
+#!/bin/sh
+
+usage() {
+  cat <<'EOF'
+usage: git amend [options] [--] [commit args...]
+
+Amend the previous commit.
+
+Options:
+  --no-edit          amend without changing the commit message
+  --edit            open editor for commit message
+  --reset-author    reset author to current Git identity
+  --no-verify       bypass commit hooks
+  --all, -a         stage tracked changes before amending
+  --patch, -p       interactively stage changes before amending
+  --dry-run, -n     show what would be amended
+  --help, -h        show this help
+
+Examples:
+  git amend
+  git amend --no-edit
+  git amend -a --no-edit
+  git amend -p --no-edit
+  git amend --no-edit --reset-author
+  git amend --no-edit --author="Jane Doe <jane.doe@example.com>"
+  git amend --no-edit --no-verify
+  git amend -m "chore: new message"
+EOF
+}
+
+stage_all=0
+stage_patch=0
+dry_run=0
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+  --help | -h)
+    usage
+    exit 0
+    ;;
+  --all | -a)
+    stage_all=1
+    ;;
+  --patch | -p)
+    stage_patch=1
+    ;;
+  --dry-run | -n)
+    dry_run=1
+    ;;
+  --)
+    shift
+    break
+    ;;
+  *)
+    break
+    ;;
+  esac
+  shift
+done
+
+if [ "$stage_all" -eq 1 ] && [ "$stage_patch" -eq 1 ]; then
+  echo "error: use either --all or --patch, not both" >&2
+  exit 2
+fi
+
+if [ "$dry_run" -eq 1 ]; then
+  echo "Would run:"
+  if [ "$stage_all" -eq 1 ]; then
+    echo "  git add -u"
+  fi
+  if [ "$stage_patch" -eq 1 ]; then
+    echo "  git add -p"
+  fi
+  printf '  git commit --amend'
+  for arg in "$@"; do
+    printf ' %s' "$arg"
+  done
+  printf '\n'
+  exit 0
+fi
+
+if [ "$stage_all" -eq 1 ]; then
+  git add -u || exit
+fi
+
+if [ "$stage_patch" -eq 1 ]; then
+  git add -p || exit
+fi
+
+git commit --amend "$@"
