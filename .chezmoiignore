@@ -11,7 +11,7 @@ scripts/**
 .pre-commit-config.yaml
 .python-version
 AGENTS.md
-Brewfile
+Brewfile*
 Dockerfile
 LICENSE
 Makefile

@@ -99,6 +99,19 @@ fi
 
 brew bundle install --file="{{ .chezmoi.sourceDir }}/Brewfile"
 
+editors=(code code-insiders codium codium-insiders)
+edit=""
+for editor in "${editors[@]}"; do
+  if command -v "$editor" &>/dev/null; then
+    edit="$editor"
+    break
+  fi
+done
+
+if [ -n "$edit" ]; then
+  brew bundle install --file="{{ .chezmoi.sourceDir }}/Brewfile.vscode"
+fi
+
 if ! command -v rustup &>/dev/null; then
   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 fi

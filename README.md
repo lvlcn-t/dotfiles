@@ -1,90 +1,87 @@
 # dotfiles 🛠️
 
-Dotfiles managed by [chezmoi](https://chezmoi.io/) for a consistent development
-environment on Linux/WSL and macOS machines. Includes shell configs, development
-tools, and a bootstrap script that wires everything together.
+One command gives you a fully configured development machine — Fish
+shell with smart completions, Git with SSH-signed commits and
+per-host identity, Neovim, Kubernetes tooling (kubectl, helm, k9s,
+argocd), cloud CLIs, AeroSpace tiling on macOS, Ghostty terminal,
+and ~65 Homebrew packages. Works on Linux/WSL (Ubuntu) and macOS.
 
-## What's here
-
-### Shells
-
-- **dot_zshrc** + **dot_zshrc.d/**: Zsh with modular config (aliases, plugins,
-  environment variables, key bindings).
-- **dot_config/fish/**: Fish shell — primary shell with
-  [fisher](https://github.com/jorgebucaran/fisher) plugins, custom functions,
-  fzf bindings, starship prompt, and Zoxide navigation.
-- **dot_config/starship.toml**: Starship prompt with Gruvbox Dark theme and
-  multi-language support (used by both Zsh and Fish).
-- **dot_p10k.zsh**: Powerlevel10k fallback theme for Zsh.
-- **dot_tmux.conf**: Tmux with `C-a` prefix and mouse support.
-
-### Git
-
-- **dot_gitconfig.tmpl**: Global Git settings — SSH signing, automatic signoff,
-  difftastic, and Git LFS. The `glab` credential helper path is templated per
-  OS (Linux vs macOS).
-- **dot_gitconfig-personal** / **dot_gitconfig-work**: Applied automatically via
-  `includeIf hasconfig:remote.*.url` based on whether the remote is GitHub or
-  the internal GitLab instance.
-
-### Tools
-
-- **dot_config/k9s/**: k9s Kubernetes TUI — config, resource aliases, and
-  plugins (including a `ssh-node.sh` helper).
-- **opencode**: [opencode](https://opencode.ai) AI assistant — MCP servers,
-  custom agents, and the `/review` slash command. Managed via
-  [lvlcn-t/agents](https://github.com/lvlcn-t/agents) (external repo,
-  pulled by `.chezmoiexternal.toml`).
-- **Brewfile**: ~65 packages — Kubernetes tools (kubectl, helm, k9s, argocd),
-  cloud CLIs (awscli, azure-cli, azd), development languages (Go, Python 3.14),
-  IaC tooling (terraform, kcl, helm-docs), and productivity utilities (bat, eza,
-  fzf, ripgrep, lazygit).
-
-## Installation
+## Quick start
 
 > [!WARNING]
-> This will overwrite existing config files. Back up your dotfiles first.
+> This will overwrite existing config files. Back up your dotfiles
+> first.
 
 ```bash
 sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply lvlcn-t
 ```
 
-### What gets bootstrapped
+This configures passwordless `sudo` for your user, installs all
+packages, and sets up the shell. Afterwards, a wizard asks for Git
+tokens and optional proxy settings:
 
-- Passwordless `sudo` for `$USER`.
-- Zsh as default shell (or Fish, if already set).
-- Fish shell with fisher plugins: fzf, git, kubectl-aliases, tmux, One Dark
-  theme, nvm, Zoxide (`z`), and `bass` for sourcing bash scripts.
-- All dependencies from [`Brewfile`](Brewfile) via [Homebrew](https://brew.sh/).
-- Starship prompt with Gruvbox theme; Powerlevel10k as Zsh fallback.
-- Tmux configuration with intuitive key bindings.
-- Git with SSH signing, auto-signoff, difftastic, and context-specific configs.
-- Neovim from [kickstart.nvim](https://github.com/lvlcn-t/kickstart.nvim).
-- Rust (rustup), Node.js (nvm), Python (Poetry).
-- Docker — Linux/WSL only (skipped on macOS).
-- Homebrew path resolved dynamically (`brew --prefix`) — works on both Linux
-  (`/home/linuxbrew/.linuxbrew`) and macOS (`/opt/homebrew`).
-- pre-commit hooks with gitleaks for secret scanning.
-
-### Post-installation
-
-The interactive wizard (`make prep`) prompts for:
-
-- **Netrc credentials**: GitHub and GitLab tokens for private repo access.
-- **Proxy settings**: HTTP/HTTPS proxy (optional).
-- **Conjur integration**: Secret management (optional).
-
-Skip any section to preserve existing config, or re-run anytime with
-`make prep`.
-
-## Common commands
+You can retrigger the wizard anytime by running:
 
 ```bash
-chezmoi apply           # apply dotfiles to the system
-chezmoi diff            # preview pending changes
-chezmoi apply --verbose # verbose apply
-make prep               # re-run the config wizard
-make debug              # test bootstrap in Docker (Ubuntu 24.04)
+uv run python3 scripts/configure.py
 ```
 
-For AI agents and detailed repo conventions, see [AGENTS.md](AGENTS.md).
+## What you get
+
+- **Shell**: Fish (primary) with fzf, Zoxide, starship prompt; Zsh as
+  fallback with Powerlevel10k; Passwordless `sudo` setup for convenience
+- **Git**: SSH signing, auto-signoff, difftastic diffs, separate
+  identities for GitHub / GitLab / work
+- **Editor**: Neovim ([kickstart.nvim][nvim] config, pulled
+  automatically)
+- **Terminal**: [Ghostty][ghostty] config, tmux with `C-a` prefix
+- **macOS**: [AeroSpace][aerospace] tiling window manager
+- **Kubernetes**: k9s with custom aliases and plugins
+- **AI**: [opencode][opencode] assistant with MCP servers and custom
+  agents ([lvlcn-t/agents][agents])
+- **VS Code**: Dozens of extensions bundled in
+  [`Brewfile.vscode`][brewfile-vscode]
+
+## Day-to-day commands
+
+| Command        | What it does                                         |
+| -------------- | ---------------------------------------------------- |
+| `make install` | Fresh apply (wipes state, re-runs bootstrap scripts) |
+| `make debug`   | Test the full bootstrap in Docker                    |
+| `make bundle`  | Snapshot current brew/vscode packages into Brewfiles |
+
+## Configuration
+
+The wizard writes `~/.config/chezmoi/chezmoi.toml`. Key settings:
+
+| Variable                | Purpose                          |
+| ----------------------- | -------------------------------- |
+| `machine.proxy.enabled` | Toggle proxy in npmrc/wgetrc/env |
+| `machine.proxy.http`    | HTTP proxy URL                   |
+| `netrc.github_token`    | GitHub PAT for private repos     |
+| `netrc.gitlab_token`    | GitLab PAT for private repos     |
+
+## Gotchas
+
+Things that break silently or look like bugs but aren't:
+
+| Trap                              | Fix                                                                    |
+| --------------------------------- | ---------------------------------------------------------------------- |
+| Bootstrap scripts won't re-run    | `make install` (wipes chezmoi state)                                   |
+| `GH_TOKEN` set in env             | Breaks `gh copilot`. Keep it commented in `env.zsh.tmpl`               |
+| Zsh keybindings don't work        | `history-substring-search` needs `defer:3` (after syntax-highlighting) |
+| Config wizard keeps triggering    | Intentional — it deletes config when identical to template             |
+| Neovim/agents missing after apply | Network required — `.chezmoiexternal.toml` pulls them at apply time    |
+
+## See also
+
+- [AGENTS.md](AGENTS.md) — repo internals, code style, CI
+- [chezmoi documentation][chezmoi]
+
+[chezmoi]: https://www.chezmoi.io/
+[nvim]: https://github.com/lvlcn-t/kickstart.nvim
+[ghostty]: https://ghostty.org/
+[aerospace]: https://github.com/nikitabobko/AeroSpace
+[opencode]: https://opencode.ai
+[agents]: https://github.com/lvlcn-t/agents
+[brewfile-vscode]: ./Brewfile.vscode
