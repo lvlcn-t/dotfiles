@@ -4,7 +4,7 @@
 # This script is consumed by chezmoi to install dependencies once before running the dotfiles.
 # It is idempotent and can be run multiple times without causing issues.
 
-set -eao pipefail
+set -eo pipefail
 
 # keyring_installed checks if a keyring is installed
 keyring_installed() {
@@ -67,11 +67,6 @@ done
 sudo install -m 0755 -d /etc/apt/keyrings
 {{- end }}
 
-if [ "$SHELL" != "$(command -v zsh)" ] && [ "$SHELL" != "$(command -v fish)" ]; then
-  echo "Setting fish as the default shell"
-  chsh -s "$(command -v fish)" "$(whoami)"
-fi
-
 {{- $brew := findExecutable "brew" (list
     "/home/linuxbrew/.linuxbrew/bin"
     "/opt/homebrew/bin"
@@ -83,6 +78,7 @@ eval "$("{{ $brew }}" shellenv)"
 {{- else }}
 NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
+found=0
 for brew in \
   /home/linuxbrew/.linuxbrew/bin/brew \
   /opt/homebrew/bin/brew \
@@ -90,28 +86,32 @@ for brew in \
 do
   if [ -x "$brew" ]; then
     eval "$("$brew" shellenv)"
+    found=1
     break
   fi
+done
+
+if [ "$found" -ne 1 ]; then
   echo "ERROR: Homebrew not found in expected locations. Please check the installation." >&2
   exit 1
-done
+fi
 {{- end }}
 
-brew bundle install --file={{ .chezmoi.sourceDir }}/Brewfile
+brew bundle install --file="{{ .chezmoi.sourceDir }}/Brewfile"
 
 if ! command -v rustup &>/dev/null; then
   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 fi
 
-if ! command -v pipx &>/dev/null; then
+if command -v pipx &>/dev/null; then
   pipx ensurepath
   if ! command -v poetry &>/dev/null; then
     pipx install poetry
   fi
 fi
 
-if ! command -v nvm &>/dev/null; then
-  PROFILE=/dev/null bash -c 'curl -fsSL -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash'
+if [ ! -d "$HOME/.nvm" ]; then
+  PROFILE=/dev/null bash -c 'curl -fsSL -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash'
 fi
 
 {{- if ne .chezmoi.os "darwin" }}
@@ -126,5 +126,17 @@ if ! command -v docker &>/dev/null; then
   done
 fi
 {{- end }}
+
+fish_path="$(command -v fish)"
+if [ "$SHELL" != "$(command -v zsh)" ] && [ "$SHELL" != "$fish_path" ]; then
+  if ! grep -qxF "$fish_path" /etc/shells; then
+    echo "Adding $fish_path to /etc/shells"
+    echo "$fish_path" | sudo tee -a /etc/shells >/dev/null
+  fi
+
+  echo "Setting fish as the default shell"
+  sudo chsh -s "$fish_path" "$(whoami)"
+fi
+
 
 unset -f keyring_installed install_or_update add_repo
