@@ -25,7 +25,7 @@ func newApplyCmd() *cobra.Command {
 
 			if IsNonInteractive() {
 				if !config.Exists() {
-					fmt.Println("No configuration found. Writing template defaults.")
+					fmt.Fprintln(cmd.OutOrStdout(), "No configuration found. Writing template defaults.")
 					if err := config.CopyTemplate(); err != nil {
 						return err
 					}

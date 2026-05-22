@@ -44,4 +44,6 @@ image: build ## Build Docker image for testing
 
 .PHONY: debug
 debug: image ## Run dotfiles in Docker interactively
-	@docker run -it --rm dotfiles dotfiles apply --non-interactive --verbose
+	@docker run -it --rm \
+		-v $(PWD):/home/testuser/.local/share/chezmoi \
+		dotfiles dotfiles apply --non-interactive --verbose

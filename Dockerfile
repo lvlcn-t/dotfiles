@@ -1,7 +1,7 @@
 FROM ubuntu:26.04
 
-ARG TARGETPLATFORM
 ARG DEBIAN_FRONTEND=noninteractive
+ARG TARGETPLATFORM
 
 RUN apt-get update && \
     apt-get install -y sudo curl passwd adduser
@@ -14,7 +14,6 @@ COPY ${TARGETPLATFORM}/dotfiles /usr/local/bin/dotfiles
 USER testuser
 WORKDIR /home/testuser
 
-RUN sh -c "$(curl -fsLS get.chezmoi.io) && echo 'export PATH=$HOME/bin:$PATH' >> ~/.bashrc"
-COPY --chown=testuser:testuser . /home/testuser/.local/share/chezmoi
+RUN sh -c "$(curl -fsLS get.chezmoi.io)" && echo 'export PATH=$HOME/bin:$PATH' >> ~/.bashrc
 
 CMD ["dotfiles", "apply", "--non-interactive"]
