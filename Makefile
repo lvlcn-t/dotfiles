@@ -1,41 +1,47 @@
 .DEFAULT_GOAL := help
 SHELL := /bin/bash
 
+VERSION := $(shell git describe --tags --always --dirty 2>/dev/null || echo "v0.0.0")
+LDFLAGS := -s -w -X main.version=$(VERSION)
+ARGS :=
+
 .PHONY: help
-help:
-	@echo "📖 Usage: make [target]"
+help: ## Display this help
+	@echo "Usage: make [target]"
 	@echo ""
-	@echo "🎯 Targets:"
-	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  %-20s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@echo "Targets:"
+	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z0-9_-]+:.*?## / {printf "\033[36m%-20s\033[0m- %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+
+.PHONY: build
+build: ## Build the CLI binary
+	@go build -ldflags="$(LDFLAGS)" -o bin/dotfiles main.go
+
+.PHONY: dev
+dev: build ## Build and run the CLI (e.g. make dev ARGS="apply")
+	@./bin/dotfiles $(ARGS)
+
+.PHONY: test
+test: ## Run all tests
+	@go test -race -cover -count=1 -v ./...
 
 .PHONY: clean-state
-clean-state: ## 🧹 Cleans up the Chezmoi state buckets
-	@echo "🧹 Cleaning up the Chezmoi state buckets..."
+clean-state: ## Clean Chezmoi state buckets
 	@chezmoi state delete-bucket --bucket=entryState
 	@chezmoi state delete-bucket --bucket=scriptState
-	@echo "✅ Chezmoi state buckets cleaned successfully."
-
 
 .PHONY: install
-install: clean-state ## 📦 Installs the dotfiles on your system
-	@echo "🔧 Installing dotfiles..."
-	@chezmoi apply
-	@echo "✅ Dotfiles installed successfully."
+install: build clean-state ## Build and apply dotfiles (wipes state first)
+	@./bin/dotfiles apply
 
 .PHONY: bundle
-bundle: ## 📦 Updates the Brewfile with the currently installed Homebrew packages
-	@echo "🔄 Updating Brewfile with currently installed Homebrew packages..."
+bundle: ## Update Brewfiles with currently installed packages
 	@brew bundle dump --no-vscode --force --file=./Brewfile
 	@brew bundle dump --vscode --force --file=./Brewfile.vscode
-	@echo "✅ Brewfile updated successfully."
 
 .PHONY: image
-image: ## 🐳 Builds the Docker image for testing
-	@echo "🐳 Building Docker image..."
-	@docker build -f Dockerfile -t dotfiles .
-	@echo "✅ Docker image built successfully."
+image: build ## Build Docker image for testing
+	@docker build --build-arg TARGETPLATFORM=bin -f Dockerfile -t dotfiles .
 
 .PHONY: debug
-debug: image ## 🐛 Debugs the dotfiles
-	@echo "🧩 Running container to apply dotfiles..."
-	@docker run -it --rm dotfiles bash -c "/home/testuser/bin/chezmoi apply --verbose --force && /bin/bash"
+debug: image ## Run dotfiles in Docker interactively
+	@docker run -it --rm dotfiles dotfiles apply --non-interactive --verbose

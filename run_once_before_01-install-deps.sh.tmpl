@@ -38,16 +38,6 @@ export http_proxy="{{ .machine.proxy.http }}"
 export https_proxy="{{ .machine.proxy.https }}"
 export NO_PROXY="{{ .machine.proxy.no_proxy }}"
 export no_proxy="{{ .machine.proxy.no_proxy }}"
-{{- else }}
-if [ -z "$HTTP_PROXY" ] && [ -z "$HTTPS_PROXY" ]; then
-  read -p "Do you need to set an HTTP/HTTPS Proxy? (y/n): " proxy_required
-  if [[ $proxy_required == "y" ]]; then
-    read -p "Enter the HTTP Proxy: " http_proxy
-    read -p "Enter the HTTPS Proxy: " https_proxy
-    export HTTP_PROXY="$http_proxy"
-    export HTTPS_PROXY="$https_proxy"
-  fi
-fi
 {{- end }}
 
 if ! sudo grep -q "^$(whoami) ALL=(ALL:ALL) NOPASSWD:ALL" /etc/sudoers.d/$(whoami) 2>/dev/null; then

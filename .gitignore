@@ -4,3 +4,5 @@ chezmoi.toml
 scripts/install-deps.sh
 Brewfile.lock.json
 .venv
+bin/
+dist/
