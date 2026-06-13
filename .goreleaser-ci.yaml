@@ -1,0 +1,38 @@
+version: 2
+project_name: dotfiles
+
+snapshot:
+  version_template: "commit-{{ .ShortCommit }}"
+
+builds:
+  - id: linux
+    main: .
+    binary: dotfiles
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w -X main.version={{ .Version }}
+      - -extldflags "-static"
+    goos:
+      - linux
+    goarch:
+      - amd64
+      - arm64
+
+dockers_v2:
+  - ids:
+      - linux
+    images:
+      - ghcr.io/lvlcn-t/dotfiles
+    tags:
+      - "{{ .Version }}"
+    labels:
+      "org.opencontainers.image.title": "{{ .ProjectName }}"
+      "org.opencontainers.image.description": "This is a pre-release version. Do not use this in production!"
+      "org.opencontainers.image.source": "https://github.com/lvlcn-t/dotfiles"
+      "org.opencontainers.image.version": "{{ .Version }}"
+      "org.opencontainers.image.created": "{{ .Timestamp }}"
+      "org.opencontainers.image.revision": "{{ .FullCommit }}"
+      "org.opencontainers.image.licenses": "MIT"

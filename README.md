@@ -13,17 +13,18 @@ and ~65 Homebrew packages. Works on Linux/WSL (Ubuntu) and macOS.
 > first.
 
 ```bash
-sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply lvlcn-t
+sh -c "$(curl -fsLS https://raw.githubusercontent.com/lvlcn-t/dotfiles/main/scripts/install.sh)"
+dotfiles apply
 ```
 
-This configures passwordless `sudo` for your user, installs all
-packages, and sets up the shell. Afterwards, a wizard asks for Git
-tokens and optional proxy settings:
+The `dotfiles` CLI runs an interactive wizard to configure proxy,
+credentials, and machine settings, then applies your dotfiles via
+chezmoi.
 
-You can retrigger the wizard anytime by running:
+You can reconfigure anytime:
 
 ```bash
-uv run python3 scripts/configure.py
+dotfiles configure
 ```
 
 ## What you get
@@ -44,11 +45,13 @@ uv run python3 scripts/configure.py
 
 ## Day-to-day commands
 
-| Command        | What it does                                         |
-| -------------- | ---------------------------------------------------- |
-| `make install` | Fresh apply (wipes state, re-runs bootstrap scripts) |
-| `make debug`   | Test the full bootstrap in Docker                    |
-| `make bundle`  | Snapshot current brew/vscode packages into Brewfiles |
+| Command              | What it does                                         |
+| -------------------- | ---------------------------------------------------- |
+| `dotfiles apply`     | Apply dotfiles (wizard if no config)                 |
+| `dotfiles configure` | Run the interactive config wizard                    |
+| `make install`       | Fresh apply (wipes state, re-runs bootstrap scripts) |
+| `make debug`         | Test the full bootstrap in Docker                    |
+| `make bundle`        | Snapshot current brew/vscode packages into Brewfiles |
 
 ## Configuration
 
@@ -70,7 +73,6 @@ Things that break silently or look like bugs but aren't:
 | Bootstrap scripts won't re-run    | `make install` (wipes chezmoi state)                                   |
 | `GH_TOKEN` set in env             | Breaks `gh copilot`. Keep it commented in `env.zsh.tmpl`               |
 | Zsh keybindings don't work        | `history-substring-search` needs `defer:3` (after syntax-highlighting) |
-| Config wizard keeps triggering    | Intentional — it deletes config when identical to template             |
 | Neovim/agents missing after apply | Network required — `.chezmoiexternal.toml` pulls them at apply time    |
 
 ## See also
