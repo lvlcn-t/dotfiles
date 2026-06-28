@@ -1,0 +1,53 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  actions: read
+  checks: write
+  contents: write
+  packages: write
+  pull-requests: write
+  security-events: write
+
+jobs:
+  go:
+    uses: lvlcn-t/meta/.github/workflows/ci-go.yml@main
+    with:
+      go_version_file: go.mod
+      go_releaser_config: .goreleaser-ci.yaml
+    secrets: inherit
+
+  test:
+    uses: lvlcn-t/meta/.github/workflows/test.yml@main
+    with:
+      go_version_file: go.mod
+      golangci_config: .golangci.yaml
+      additional_args: -v
+    secrets: inherit
+
+  e2e:
+    needs: go
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Login to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run e2e assertions
+        run: |
+          IMAGE="ghcr.io/lvlcn-t/dotfiles:commit-$(git rev-parse --short HEAD)-amd64"
+          docker pull "$IMAGE"
+          docker run --rm \
+            -v "${{ github.workspace }}:/home/testuser/.local/share/chezmoi" \
+            "$IMAGE" \
+            bash -c "dotfiles apply --non-interactive && bash ~/.local/share/chezmoi/scripts/e2e.sh"
